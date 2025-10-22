@@ -1,0 +1,1 @@
+Projeto livraria_final - cada página é autônoma. Abra index.html ou qualquer outra página diretamente no navegador.
