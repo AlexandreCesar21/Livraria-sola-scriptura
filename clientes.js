@@ -260,4 +260,58 @@ document.addEventListener("DOMContentLoaded", () => {
   // INICIALIZAÇÃO
   // ----------------------------
   renderizarClientes();
+
+
+  // ----------------------------
+// EXCLUIR CLIENTE (com modal personalizado)
+// ----------------------------
+function excluirCliente(id) {
+  const cliente = clientes.find((c) => c.id === id);
+  if (!cliente) return;
+
+  // Cria o fundo escuro
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+
+  // Cria o modal
+  const modal = document.createElement("div");
+  modal.className = "modal-confirmacao";
+
+  modal.innerHTML = `
+    <h3>Excluir Cliente</h3>
+    <p>Tem certeza que deseja excluir este cliente?</p>
+    <div class="botoes">
+      <button class="btn-cancelar">Cancelar</button>
+      <button class="btn-confirmar">Confirmar</button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  // Fecha modal
+  const fecharModal = () => {
+    overlay.classList.remove("show");
+    setTimeout(() => overlay.remove(), 200);
+  };
+
+  // Evento Cancelar
+  modal.querySelector(".btn-cancelar").addEventListener("click", fecharModal);
+
+  // Evento Confirmar
+  modal.querySelector(".btn-confirmar").addEventListener("click", () => {
+    clientes = clientes.filter((x) => x.id !== id);
+    salvarClientes();
+    renderizarClientes();
+    showToast("delete");
+    fecharModal();
+  });
+
+  // Exibe modal suavemente
+  setTimeout(() => overlay.classList.add("show"), 50);
+}
+
 });
+
+
+
