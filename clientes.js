@@ -1,11 +1,7 @@
-// ============================
-// MÓDULO DE CLIENTES (3 toasts - mesmo visual vinho escuro)
-// ============================
+
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ----------------------------
-  // ELEMENTOS DO DOM
-  // ----------------------------
+  
   const addClientBtn = document.getElementById("addClientBtn");
   const clientModal = document.getElementById("clientModal");
   const closeClientModal = document.getElementById("closeClientModal");
@@ -18,15 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const filterCPF = document.getElementById("filterClientCPF");
   const filterStatus = document.getElementById("filterClientStatus");
 
-  // ----------------------------
-  // ESTADO E DADOS
-  // ----------------------------
+
   let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
   let clienteEditando = null;
 
-  // ----------------------------
-  // FUNÇÕES AUXILIARES
-  // ----------------------------
+  
   const salvarClientes = () =>
     localStorage.setItem("clientes", JSON.stringify(clientes));
 
@@ -43,11 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
     clienteEditando = null;
   };
 
-  // =============================
-  // TOAST UNIFICADO (vinho escuro)
-  // =============================
+  
   function showToast(tipo = "add") {
-    // Remove qualquer toast anterior
+    
     document.querySelectorAll(".toast-success").forEach((t) => t.remove());
 
     let mensagem = "Cliente adicionado com sucesso!";
@@ -63,19 +53,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.body.appendChild(toast);
 
-    // Animação de entrada
+   
     setTimeout(() => toast.classList.add("show"), 100);
 
-    // Remover automaticamente após 3s
+    
     setTimeout(() => {
       toast.classList.remove("show");
       setTimeout(() => toast.remove(), 300);
     }, 3000);
   }
 
-  // ----------------------------
-  // MÁSCARAS
-  // ----------------------------
+  
   const aplicarMascaraTelefone = (v) => {
     v = v.replace(/\D/g, "");
     if (v.length <= 10) return v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
@@ -98,9 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // ----------------------------
-  // RENDERIZAÇÃO DA TABELA
-  // ----------------------------
+
   function renderizarClientes(lista = clientes) {
     clientsTableBody.innerHTML = "";
 
@@ -141,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
       clientsTableBody.appendChild(tr);
     });
 
-    // Eventos
+   
     document.querySelectorAll(".btn-edit").forEach((btn) =>
       btn.addEventListener("click", (e) =>
         editarCliente(Number(e.currentTarget.dataset.id))
@@ -155,9 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // ----------------------------
-  // CADASTRAR / EDITAR CLIENTE
-  // ----------------------------
   clientForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -185,9 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fecharModal();
   });
 
-  // ----------------------------
-  // EDITAR CLIENTE
-  // ----------------------------
+ 
   function editarCliente(id) {
     const c = clientes.find((x) => x.id === id);
     if (!c) return;
@@ -202,9 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("clientStatus").value = c.status;
   }
 
-  // ----------------------------
-  // EXCLUIR CLIENTE
-  // ----------------------------
+ 
   function excluirCliente(id) {
     if (!confirm("Deseja realmente excluir este cliente?")) return;
     clientes = clientes.filter((x) => x.id !== id);
@@ -213,9 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showToast("delete");
   }
 
-  // ----------------------------
-  // FILTROS
-  // ----------------------------
+  
   function aplicarFiltros() {
     const nome = filterName.value.toLowerCase();
     const doc = filterCPF.value.toLowerCase();
@@ -235,9 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
   filterCPF.addEventListener("input", aplicarFiltros);
   filterStatus.addEventListener("change", aplicarFiltros);
 
-  // ----------------------------
-  // MÁSCARAS AO DIGITAR
-  // ----------------------------
   const inputDoc = document.getElementById("clientDocument");
   const inputTel = document.getElementById("clientPhone");
 
@@ -249,31 +223,21 @@ document.addEventListener("DOMContentLoaded", () => {
     e.target.value = aplicarMascaraTelefone(e.target.value);
   });
 
-  // ----------------------------
-  // CONTROLE DE MODAL
-  // ----------------------------
   addClientBtn.addEventListener("click", () => abrirModal());
   closeClientModal.addEventListener("click", fecharModal);
   cancelClientBtn.addEventListener("click", fecharModal);
 
-  // ----------------------------
-  // INICIALIZAÇÃO
-  // ----------------------------
+  
   renderizarClientes();
 
 
-  // ----------------------------
-// EXCLUIR CLIENTE (com modal personalizado)
-// ----------------------------
 function excluirCliente(id) {
   const cliente = clientes.find((c) => c.id === id);
   if (!cliente) return;
 
-  // Cria o fundo escuro
   const overlay = document.createElement("div");
   overlay.className = "modal-overlay";
 
-  // Cria o modal
   const modal = document.createElement("div");
   modal.className = "modal-confirmacao";
 
@@ -289,16 +253,13 @@ function excluirCliente(id) {
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
 
-  // Fecha modal
   const fecharModal = () => {
     overlay.classList.remove("show");
     setTimeout(() => overlay.remove(), 200);
   };
 
-  // Evento Cancelar
   modal.querySelector(".btn-cancelar").addEventListener("click", fecharModal);
 
-  // Evento Confirmar
   modal.querySelector(".btn-confirmar").addEventListener("click", () => {
     clientes = clientes.filter((x) => x.id !== id);
     salvarClientes();
@@ -307,7 +268,6 @@ function excluirCliente(id) {
     fecharModal();
   });
 
-  // Exibe modal suavemente
   setTimeout(() => overlay.classList.add("show"), 50);
 }
 
