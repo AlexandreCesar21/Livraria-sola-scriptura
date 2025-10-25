@@ -13,6 +13,146 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+
+    <style>
+      #deleteBookModal.modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(35, 35, 35, 0.55);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 9999;
+      }
+
+      #deleteBookModal.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      #deleteBookModal .modal-content.confirm {
+        background: #fff;
+        border-radius: 14px;
+        padding: 30px 40px;
+        width: 380px;
+        text-align: center;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        animation: scaleIn 0.25s ease;
+      }
+
+      @keyframes scaleIn {
+        from {
+          transform: scale(0.9);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      #deleteBookModal .modal-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--primary-color, #4b0e0e);
+        margin-bottom: 10px;
+      }
+
+      #deleteBookModal .modal-message {
+        font-size: 1rem;
+        color: #333;
+        margin-bottom: 25px;
+      }
+
+      #deleteBookModal .modal-actions {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+      }
+
+      #deleteBookModal .modal-actions .btn {
+        padding: 10px 24px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      #deleteBookModal .btn-secondary {
+        background-color: #fff;
+        border: 2px solid var(--primary-color, #4b0e0e);
+      }
+
+      #deleteBookModal .btn-secondary:hover {
+        background-color: var(--primary-color, #4b0e0e);
+        color: #fff;
+      }
+
+      #deleteBookModal .btn-danger {
+        background-color: var(--primary-color, #4b0e0e);
+        color: #fff;
+      }
+
+      #deleteBookModal .btn-danger:hover {
+        background-color: #2a0000;
+      }
+
+.toast-container {
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  background: var(--primary-color, #4b0e0e);
+  color: #fff;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 12px 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  min-width: 240px;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: toastIn 0.3s ease forwards;
+}
+
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast.hide {
+  animation: toastOut 0.3s ease forwards;
+}
+
+@keyframes toastOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+    </style>
   </head>
   <body>
     <div id="dashboard" class="dashboard">
@@ -814,6 +954,27 @@
         </div>
       </div>
     </div>
+
+    <div id="deleteBookModal" class="modal">
+      <div class="modal-content confirm">
+        <h2 class="modal-title">Excluir Livro</h2>
+        <p class="modal-message">Tem certeza que deseja excluir este livro?</p>
+
+        <div class="modal-actions">
+          <button id="cancelDeleteBookBtn" class="btn btn-secondary">
+            Cancelar
+          </button>
+          <button id="confirmDeleteBookBtn" class="btn btn-danger">
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+
+
     <div id="toastContainer"></div>
     <script src="livros.js"></script>
   </body>
