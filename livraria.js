@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const cancelBtn = document.getElementById("cancelBookstoreBtn");
   const form = document.getElementById("bookstoreForm");
 
-  // Campos de exibição
   const fields = {
     name: document.getElementById("bookstoreName"),
     cnpj: document.getElementById("bookstoreCNPJ"),
@@ -17,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cep: document.getElementById("bookstoreCEP"),
   };
 
-  // Campos do formulário
   const formFields = {
     name: document.getElementById("bookstoreFormName"),
     cnpj: document.getElementById("bookstoreFormCNPJ"),
@@ -29,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cep: document.getElementById("bookstoreFormCEP"),
   };
 
-  // Carregar dados salvos
   function loadBookstore() {
     const saved = JSON.parse(localStorage.getItem("bookstoreData"));
     if (saved) {
@@ -39,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Abrir modal
   editBtn.addEventListener("click", () => {
     const saved = JSON.parse(localStorage.getItem("bookstoreData"));
     if (saved) {
@@ -54,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.add("show");
   });
 
-  // Fechar modal
   const closeModal = () => modal.classList.remove("show");
   closeModalBtn.addEventListener("click", closeModal);
   cancelBtn.addEventListener("click", closeModal);
@@ -62,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === modal) closeModal();
   });
 
-  // Salvar informações
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -71,20 +65,16 @@ document.addEventListener("DOMContentLoaded", () => {
       data[key] = formFields[key].value.trim();
     });
 
-    // Salvar no localStorage
     localStorage.setItem("bookstoreData", JSON.stringify(data));
 
-    // Atualizar visualmente
     Object.keys(fields).forEach((key) => {
       fields[key].textContent = data[key];
     });
 
-    // Fechar modal e mostrar mensagem
     modal.classList.remove("show");
     showToast("Informações da livraria atualizadas com sucesso!");
   });
 
-  // Função Toast simples
   function showToast(message, type = "success") {
     const toast = document.createElement("div");
     toast.className = `toast show ${type}`;
@@ -96,6 +86,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 
-  // Carregar dados ao iniciar
   loadBookstore();
 });

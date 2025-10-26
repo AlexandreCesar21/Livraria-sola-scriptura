@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
   try {
     const $ = id => document.getElementById(id);
 
-    // Elementos principais
     const loanCartBookSelect = $("loanCartBookSelect");
     const loanCartQuantity = $("loanCartQuantity");
     const addToLoanCartBtn = $("addToLoanCartBtn");
@@ -17,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const loanTotalItems = $("loanTotalItems");
     const loansTableBody = $("loansTableBody");
 
-    // Chaves do localStorage
     const KEY_BOOKS = "livraria_books";
     const KEY_CLIENTS = "livraria_clients";
     const KEY_LOANS = "livraria_loans";
@@ -26,14 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let clients = JSON.parse(localStorage.getItem(KEY_CLIENTS)) || [];
     let loans = JSON.parse(localStorage.getItem(KEY_LOANS)) || [];
 
-    // Utils
     const formatDate = d => new Date(d).toLocaleDateString("pt-BR");
     const todayISO = () => new Date().toISOString();
 
     const saveBooks = () => localStorage.setItem(KEY_BOOKS, JSON.stringify(books));
     const saveLoans = () => localStorage.setItem(KEY_LOANS, JSON.stringify(loans));
 
-    // Toast simples
     function showToast(msg) {
       const toast = document.createElement("div");
       toast.textContent = msg;
@@ -52,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => toast.remove(), 2500);
     }
 
-    // Preenche selects
     function populateLoanBookSelect() {
       loanCartBookSelect.innerHTML = `<option value="">Selecione um livro disponível</option>`;
       books.filter(b => b.status === "ATIVO" && b.quantity > 0)
@@ -74,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Carrinho
     let cart = [];
 
     function updateLoanCartUI() {
@@ -124,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (loanCheckoutSection) loanCheckoutSection.style.display = "block";
     }
 
-    // Adicionar livro ao carrinho
     addToLoanCartBtn.addEventListener("click", () => {
       const id = loanCartBookSelect.value;
       const qtd = Number(loanCartQuantity.value);
@@ -157,14 +150,12 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("Livro adicionado ao carrinho");
     });
 
-    // Limpar carrinho
     clearLoanCartBtn.addEventListener("click", () => {
       cart = [];
       updateLoanCartUI();
       showToast("Carrinho limpo");
     });
 
-    // Ações nos botões do carrinho
     loanCartItemsContainer.addEventListener("click", (e) => {
       const idx = e.target.dataset.idx;
       if (e.target.classList.contains("btn-minus")) {
@@ -180,7 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Registrar empréstimo
     loanCheckoutForm.addEventListener("submit", (e) => {
       e.preventDefault();
       if (!cart.length) return showToast("Carrinho vazio");
@@ -204,7 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
         itens: cart.map(c => ({ id: c.id, title: c.title, qtd: c.qtd }))
       };
 
-      // Atualiza estoque
       cart.forEach(it => {
         const b = books.find(b => b.id === it.id);
         if (b) b.quantity -= it.qtd;
@@ -222,7 +211,6 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("Empréstimo registrado com sucesso!");
     });
 
-    // Renderizar tabela de empréstimos
     function renderLoansTable() {
       loansTableBody.innerHTML = "";
       if (!loans.length) {
@@ -257,7 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Registrar devolução
     loansTableBody.addEventListener("click", e => {
       if (e.target.classList.contains("btn-return")) {
         const id = e.target.dataset.id;
@@ -277,7 +264,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Inicialização
     populateLoanBookSelect();
     populateLoanClientSelect();
     renderLoansTable();

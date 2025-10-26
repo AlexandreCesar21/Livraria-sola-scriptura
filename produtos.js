@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Seletores principais
   const form = document.getElementById("productForm");
   const tabelaBody = document.getElementById("productsTableBody");
   const addBtn = document.getElementById("addProductBtn");
@@ -7,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeBtn = document.getElementById("closeProductModal");
   const cancelBtn = document.getElementById("cancelProductBtn");
 
-  // Campos do formulário
   const codeInput = document.getElementById("productCode");
   const nameInput = document.getElementById("productName");
   const brandInput = document.getElementById("productBrand");
@@ -18,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const quantityInput = document.getElementById("productQuantity");
   const descriptionInput = document.getElementById("productDescription");
 
-  // Campos de filtro
   const filterName = document.getElementById("filterProductName");
   const filterBrand = document.getElementById("filterProductBrand");
   const filterCategory = document.getElementById("filterProductCategory");
@@ -47,11 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const formatarValor = (valor) =>
     (Number(valor) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-  // ---------- RENDERIZAÇÃO DA TABELA ----------
   function renderizarTabela() {
     tabelaBody.innerHTML = "";
 
-    // Aplica filtros
     let lista = produtos.slice();
 
     const nomeFiltro = filterName?.value.trim().toLowerCase() || "";
@@ -114,7 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- SALVAR / EDITAR ----------
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -151,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
     limparFormulario();
   });
 
-  // ---------- EDIÇÃO E EXCLUSÃO ----------
   tabelaBody.addEventListener("click", (e) => {
     const btnEditar = e.target.closest(".editar");
     const btnExcluir = e.target.closest(".excluir");
@@ -186,7 +179,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ---------- AÇÕES DO MODAL ----------
   addBtn.addEventListener("click", () => {
     limparFormulario();
     abrirModal();
@@ -194,7 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
   closeBtn.addEventListener("click", fecharModal);
   cancelBtn.addEventListener("click", fecharModal);
 
-  // ---------- EVENTOS DOS FILTROS ----------
   if (filterName) filterName.addEventListener("input", renderizarTabela);
   if (filterBrand) filterBrand.addEventListener("input", renderizarTabela);
   if (filterCategory) filterCategory.addEventListener("change", renderizarTabela);
@@ -215,6 +206,5 @@ document.addEventListener("DOMContentLoaded", () => {
       renderizarTabela();
     });
 
-  // ---------- Inicialização ----------
   renderizarTabela();
 });

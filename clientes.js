@@ -12,13 +12,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const filterCPF = document.getElementById("filterClientCPF");
   const filterStatus = document.getElementById("filterClientStatus");
 
-  // Corrigido: nome do armazenamento para compatibilidade com o módulo de vendas
   let clientes = JSON.parse(localStorage.getItem("livraria_clients")) || [];
   let clienteEditando = null;
 
   const salvarClientes = () => {
     localStorage.setItem("livraria_clients", JSON.stringify(clientes));
-    // Atualiza automaticamente o módulo de vendas
     window.dispatchEvent(new Event("clientsUpdated"));
   };
 
@@ -35,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     clienteEditando = null;
   };
 
-  // === TOAST ===
   function showToast(tipo = "add") {
     document.querySelectorAll(".toast-success").forEach((t) => t.remove());
     let mensagem = "Cliente adicionado com sucesso!";
@@ -56,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 
-  // === Máscaras ===
   const aplicarMascaraTelefone = (v) => {
     v = v.replace(/\D/g, "");
     if (v.length <= 10) return v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
@@ -79,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // === Renderização da tabela ===
   function renderizarClientes(lista = clientes) {
     clientsTableBody.innerHTML = "";
 
@@ -133,7 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // === Formulário ===
   clientForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -161,7 +155,6 @@ document.addEventListener("DOMContentLoaded", () => {
     fecharModal();
   });
 
-  // === Editar cliente ===
   function editarCliente(id) {
     const c = clientes.find((x) => x.id === id);
     if (!c) return;
@@ -176,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("clientStatus").value = c.status;
   }
 
-  // === Excluir cliente com modal ===
   function excluirCliente(id) {
     const cliente = clientes.find((c) => c.id === id);
     if (!cliente) return;
@@ -217,7 +209,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => overlay.classList.add("show"), 50);
   }
 
-  // === Filtros ===
   function aplicarFiltros() {
     const nome = filterName.value.toLowerCase();
     const doc = filterCPF.value.toLowerCase();
@@ -237,7 +228,6 @@ document.addEventListener("DOMContentLoaded", () => {
   filterCPF.addEventListener("input", aplicarFiltros);
   filterStatus.addEventListener("change", aplicarFiltros);
 
-  // === Máscaras ===
   const inputDoc = document.getElementById("clientDocument");
   const inputTel = document.getElementById("clientPhone");
 

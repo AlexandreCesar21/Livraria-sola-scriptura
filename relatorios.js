@@ -10,13 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const reportSummary = $("reportSummary");
   const reportInfo = $("reportInfo");
 
-  // Chaves de armazenamento
   const KEY_BOOKS = "livraria_books";
   const KEY_LOANS = "livraria_loans";
   const KEY_CLIENTS = "livraria_clients";
   const KEY_SALES = "livraria_sales";
 
-  // Funções utilitárias
   const load = (key) => JSON.parse(localStorage.getItem(key) || "[]");
   const formatMoney = (v) =>
     (Number(v) || 0).toLocaleString("pt-BR", {
@@ -39,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
       second: "2-digit",
     });
 
-  // Função de filtragem
   function filtrarLivros(tipo, filtro) {
     const livros = load(KEY_BOOKS);
     const texto = filtro.trim().toLowerCase();
@@ -68,7 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Renderização da tabela
   function renderTabela(livros) {
     tableHead.innerHTML = `
       <tr>
@@ -119,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
   ).length;
   const clientesCadastrados = clients.length;
 
-  // Estatísticas gerais de livros
   const totalTitulos = books.length;
   const livrosAtivos = books.filter(
     (b) => b.status?.toUpperCase() === "ATIVO"
@@ -142,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
     second: "2-digit",
   });
 
-  // Renderiza os dois cards apenas
   document.getElementById("reportInfo").innerHTML = `
     <div class="info-box">
       <!-- Estatísticas Gerais -->
@@ -167,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
 
-  // Geração de relatório
   generateBtn.addEventListener("click", () => {
     const tipo = reportType.value;
     const filtro = reportFilter.value;
@@ -180,7 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
     reportSummary.style.display = "block";
   });
 
-  // Inicialização automática ao carregar
   const livros = load(KEY_BOOKS);
   renderTabela(livros);
   atualizarInformacoes(livros, "", "general");

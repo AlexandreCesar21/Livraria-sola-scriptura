@@ -7,14 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeModalBtn = document.getElementById("closeUserModal");
   const cancelBtn = document.getElementById("cancelUserBtn");
 
-  // Campos do formulário
   const nameInput = document.getElementById("userName");
   const emailInput = document.getElementById("userEmail");
   const passwordInput = document.getElementById("userPassword");
   const typeInput = document.getElementById("userType");
   const statusInput = document.getElementById("userStatus");
 
-  // Filtros
   const filterName = document.getElementById("filterUserName");
   const filterType = document.getElementById("filterUserType");
   const filterStatus = document.getElementById("filterUserStatus");
@@ -23,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let usuarios = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
   let editId = null;
 
-  // ---------- Usuário Admin padrão ----------
   if (!usuarios.some((u) => u.tipo === "Administrador Principal")) {
     usuarios.unshift({
       id: "admin001",
@@ -38,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(usuarios));
   }
 
-  // ---------- Utilitários ----------
   const salvarLocal = () =>
     localStorage.setItem(STORAGE_KEY, JSON.stringify(usuarios));
 
@@ -75,11 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return d.toLocaleDateString("pt-BR");
   };
 
-  // ---------- Renderização da tabela ----------
   function renderTabela() {
     tabelaBody.innerHTML = "";
 
-    // Aplicar filtros
     let lista = usuarios.slice();
 
     const nomeFiltro = filterName.value.trim().toLowerCase();
@@ -129,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---------- Adicionar / Editar usuário ----------
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -176,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
     limparForm();
   });
 
-  // ---------- Editar / Excluir ----------
   tabelaBody.addEventListener("click", (e) => {
     const btnEditar = e.target.closest(".editar");
     const btnExcluir = e.target.closest(".excluir");
@@ -213,7 +205,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ---------- Filtros dinâmicos ----------
   [filterName, filterType, filterStatus].forEach((f) =>
     f.addEventListener("input", renderTabela)
   );
@@ -226,7 +217,6 @@ document.addEventListener("DOMContentLoaded", () => {
       renderTabela();
     });
 
-  // ---------- Modal ----------
   addBtn.addEventListener("click", () => {
     limparForm();
     abrirModal();
@@ -238,6 +228,5 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === modal) fecharModal();
   });
 
-  // ---------- Inicialização ----------
   renderTabela();
 });
