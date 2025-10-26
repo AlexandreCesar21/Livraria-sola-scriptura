@@ -1,7 +1,5 @@
-
-
 document.addEventListener("DOMContentLoaded", () => {
-  
+
   const addClientBtn = document.getElementById("addClientBtn");
   const clientModal = document.getElementById("clientModal");
   const closeClientModal = document.getElementById("closeClientModal");
@@ -14,13 +12,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const filterCPF = document.getElementById("filterClientCPF");
   const filterStatus = document.getElementById("filterClientStatus");
 
-
-  let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+  // Corrigido: nome do armazenamento para compatibilidade com o módulo de vendas
+  let clientes = JSON.parse(localStorage.getItem("livraria_clients")) || [];
   let clienteEditando = null;
 
-  
-  const salvarClientes = () =>
-    localStorage.setItem("clientes", JSON.stringify(clientes));
+  const salvarClientes = () => {
+    localStorage.setItem("livraria_clients", JSON.stringify(clientes));
+    // Atualiza automaticamente o módulo de vendas
+    window.dispatchEvent(new Event("clientsUpdated"));
+  };
 
   const gerarId = () => Date.now();
 
@@ -35,11 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
     clienteEditando = null;
   };
 
-  
+  // === TOAST ===
   function showToast(tipo = "add") {
-    
     document.querySelectorAll(".toast-success").forEach((t) => t.remove());
-
     let mensagem = "Cliente adicionado com sucesso!";
     if (tipo === "edit") mensagem = "Cliente atualizado com sucesso!";
     if (tipo === "delete") mensagem = "Cliente excluído com sucesso!";
@@ -50,20 +48,15 @@ document.addEventListener("DOMContentLoaded", () => {
       <span class="toast-icon">✔</span>
       <span class="toast-message">${mensagem}</span>
     `;
-
     document.body.appendChild(toast);
-
-   
     setTimeout(() => toast.classList.add("show"), 100);
-
-    
     setTimeout(() => {
       toast.classList.remove("show");
       setTimeout(() => toast.remove(), 300);
     }, 3000);
   }
 
-  
+  // === Máscaras ===
   const aplicarMascaraTelefone = (v) => {
     v = v.replace(/\D/g, "");
     if (v.length <= 10) return v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
@@ -86,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-
+  // === Renderização da tabela ===
   function renderizarClientes(lista = clientes) {
     clientsTableBody.innerHTML = "";
 
@@ -109,9 +102,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${c.telefone}</td>
         <td>${c.email}</td>
         <td>
-          <span class="badge ${
-            c.status === "ATIVO" ? "active" : "inactive"
-          }">${c.status === "ATIVO" ? "Ativo" : "Inativo"}</span>
+          <span class="badge ${c.status === "ATIVO" ? "active" : "inactive"}">
+            ${c.status === "ATIVO" ? "Ativo" : "Inativo"}
+          </span>
         </td>
         <td>
           <div class="action-buttons">
@@ -127,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
       clientsTableBody.appendChild(tr);
     });
 
-   
     document.querySelectorAll(".btn-edit").forEach((btn) =>
       btn.addEventListener("click", (e) =>
         editarCliente(Number(e.currentTarget.dataset.id))
@@ -141,6 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
+  // === Formulário ===
   clientForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -168,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fecharModal();
   });
 
- 
+  // === Editar cliente ===
   function editarCliente(id) {
     const c = clientes.find((x) => x.id === id);
     if (!c) return;
@@ -183,16 +176,48 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("clientStatus").value = c.status;
   }
 
- 
+  // === Excluir cliente com modal ===
   function excluirCliente(id) {
-    if (!confirm("Deseja realmente excluir este cliente?")) return;
-    clientes = clientes.filter((x) => x.id !== id);
-    salvarClientes();
-    renderizarClientes();
-    showToast("delete");
+    const cliente = clientes.find((c) => c.id === id);
+    if (!cliente) return;
+
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+
+    const modal = document.createElement("div");
+    modal.className = "modal-confirmacao";
+
+    modal.innerHTML = `
+      <h3>Excluir Cliente</h3>
+      <p>Tem certeza que deseja excluir este cliente?</p>
+      <div class="botoes">
+        <button class="btn-cancelar">Cancelar</button>
+        <button class="btn-confirmar">Confirmar</button>
+      </div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const fecharModalConfirmacao = () => {
+      overlay.classList.remove("show");
+      setTimeout(() => overlay.remove(), 200);
+    };
+
+    modal.querySelector(".btn-cancelar").addEventListener("click", fecharModalConfirmacao);
+
+    modal.querySelector(".btn-confirmar").addEventListener("click", () => {
+      clientes = clientes.filter((x) => x.id !== id);
+      salvarClientes();
+      renderizarClientes();
+      showToast("delete");
+      fecharModalConfirmacao();
+    });
+
+    setTimeout(() => overlay.classList.add("show"), 50);
   }
 
-  
+  // === Filtros ===
   function aplicarFiltros() {
     const nome = filterName.value.toLowerCase();
     const doc = filterCPF.value.toLowerCase();
@@ -212,6 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
   filterCPF.addEventListener("input", aplicarFiltros);
   filterStatus.addEventListener("change", aplicarFiltros);
 
+  // === Máscaras ===
   const inputDoc = document.getElementById("clientDocument");
   const inputTel = document.getElementById("clientPhone");
 
@@ -227,51 +253,5 @@ document.addEventListener("DOMContentLoaded", () => {
   closeClientModal.addEventListener("click", fecharModal);
   cancelClientBtn.addEventListener("click", fecharModal);
 
-  
   renderizarClientes();
-
-
-function excluirCliente(id) {
-  const cliente = clientes.find((c) => c.id === id);
-  if (!cliente) return;
-
-  const overlay = document.createElement("div");
-  overlay.className = "modal-overlay";
-
-  const modal = document.createElement("div");
-  modal.className = "modal-confirmacao";
-
-  modal.innerHTML = `
-    <h3>Excluir Cliente</h3>
-    <p>Tem certeza que deseja excluir este cliente?</p>
-    <div class="botoes">
-      <button class="btn-cancelar">Cancelar</button>
-      <button class="btn-confirmar">Confirmar</button>
-    </div>
-  `;
-
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
-
-  const fecharModal = () => {
-    overlay.classList.remove("show");
-    setTimeout(() => overlay.remove(), 200);
-  };
-
-  modal.querySelector(".btn-cancelar").addEventListener("click", fecharModal);
-
-  modal.querySelector(".btn-confirmar").addEventListener("click", () => {
-    clientes = clientes.filter((x) => x.id !== id);
-    salvarClientes();
-    renderizarClientes();
-    showToast("delete");
-    fecharModal();
-  });
-
-  setTimeout(() => overlay.classList.add("show"), 50);
-}
-
 });
-
-
-

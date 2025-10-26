@@ -13,6 +13,319 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+    <style>
+      .cart-item-card {
+  background: #fff;
+  border: 1px solid #e5dede;
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.cart-item-info {
+  flex: 1;
+  color: #3a0000;
+}
+
+.cart-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-cart-qty {
+  background: #4b0000;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.cart-qty-input {
+  width: 50px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.cart-item-total {
+  text-align: right;
+  color: #4b0000;
+  font-weight: bold;
+}
+
+.btn-delete-cart {
+  background: #ffeaea;
+  color: #d00000;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+
+  #salesTableBody td {
+  vertical-align: middle;
+  padding: 12px 16px;
+  color: #3c0d0d;
+}
+
+.sale-date {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.sale-date-main {
+  font-weight: 600;
+  color: #3c0d0d;
+}
+.sale-date-sub {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.sale-item {
+  display: flex;
+  flex-direction: column;
+}
+.sale-item-title {
+  font-weight: 600;
+  color: #3c0d0d;
+}
+.sale-item-sub {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.payment-badge {
+  background: #f2f4f7;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  color: #3c0d0d;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.status-badge {
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.status-badge.ativa {
+  background: #e8f6ed;
+  color: #2e7d32;
+}
+.status-badge.cancelada {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.sale-actions {
+  text-align: center;
+}
+.btn-view {
+  background: #e8f2ff;
+  border: none;
+  color: #0051a8;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-view:hover {
+  background: #cfe5ff;
+}
+
+}
+
+.cart-item-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 18px 24px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  transition: all 0.2s ease-in-out;
+}
+
+.cart-item-card:hover {
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.cart-item-info {
+  flex: 1;
+  color: #3a0000;
+  font-size: 0.95rem;
+}
+
+.cart-item-info strong {
+  font-size: 1rem;
+  color: #2c0000;
+}
+
+.cart-item-info small {
+  display: block;
+  color: #a07e7e;
+  margin-bottom: 6px;
+}
+
+.cart-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cart-item-actions button {
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.cart-item-actions .btn-decrease {
+  background: #e53935;
+}
+.cart-item-actions .btn-decrease:hover {
+  background: #c62828;
+}
+
+.cart-item-actions .btn-increase {
+  background: #3a0000;
+}
+.cart-item-actions .btn-increase:hover {
+  background: #520000;
+}
+
+.cart-item-actions input {
+  width: 45px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 4px;
+  font-size: 0.95rem;
+}
+
+.cart-item-total {
+  min-width: 90px;
+  text-align: right;
+  color: #3a0000;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.cart-item-total small {
+  display: block;
+  font-weight: 400;
+  color: #a07e7e;
+  font-size: 0.85rem;
+  margin-top: 3px;
+}
+
+.btn-remove {
+  background: #ffeaea;
+  color: #d00000;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 1rem;
+}
+
+.btn-remove:hover {
+  background: #fbdada;
+}
+
+.payment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f2f3f5;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-badge.ativa {
+  background: #e6f5ea;
+  color: #2d7a36;
+}
+
+.status-badge.inativa {
+  background: #fdecec;
+  color: #a12929;
+}
+
+.btn-action {
+  background: #e8f0ff;
+  border: none;
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  color: #3b82f6;
+  transition: 0.2s;
+}
+
+.btn-action:hover {
+  background: #dbe9ff;
+}
+
+.modal.show {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.4);
+}
+
+.modal:not(.show) {
+  display: none;
+}
+
+
+
+
+    </style>
   </head>
   <body>
     <div id="dashboard" class="dashboard">
@@ -126,7 +439,6 @@
                   </button>
                 </div>
               </div>
-              <!-- Add to Cart Form -->
               <div
                 style="
                   background: var(--background-secondary);
@@ -174,7 +486,6 @@
                   </div>
                 </div>
               </div>
-              <!-- Shopping Cart -->
               <div id="shoppingCart" style="margin-bottom: 24px">
                 <div class="card-header" style="margin-bottom: 16px">
                   <h3 style="color: var(--primary-color); font-size: 1.1rem">
@@ -193,7 +504,6 @@
                   </div>
                 </div>
               </div>
-              <!-- Checkout Form -->
               <div id="checkoutSection" style="display: none">
                 <div
                   style="
@@ -778,7 +1088,7 @@
       </div>
     </div>
     <div class="modal" id="returnModal">
-      <div class="modal-content">
+      <div class="modal-content"> 
         <div class="modal-header">
           <h3 class="modal-title">Processar Devolução ou Troca</h3>
           <button class="close-btn" id="closeReturnModal">
@@ -1068,5 +1378,7 @@
         });
       });
     </script>
+
+    <script src="venda.js"></script>
   </body>
 </html>
