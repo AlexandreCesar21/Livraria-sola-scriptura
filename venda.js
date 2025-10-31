@@ -229,107 +229,158 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let cart = [];
 
-    function updateCartUI() {
-      if (!cartContainer) return;
-      cartContainer.innerHTML = "";
-      if (!cart.length) {
-        cartContainer.innerHTML = `<div style="padding:14px;color:#666">Nenhum item no carrinho.</div>`;
-        if (finalTotalEl) finalTotalEl.textContent = formatCurrency(0);
-        if (checkoutSection) checkoutSection.style.display = "none";
-        if (cartItemCount) cartItemCount.textContent = "0";
-        return;
-      }
-
-      
-      cart.forEach((it, idx) => {
-        const card = document.createElement("div");
-        card.className = "cart-card";
-
-        
-        const left = document.createElement("div");
-        left.className = "left";
-
-        
-        const iconDiv = document.createElement("div");
-        iconDiv.style.fontSize = "20px";
-        iconDiv.style.lineHeight = "1";
-        iconDiv.style.marginTop = "2px";
-        iconDiv.textContent = ICONS[it.categoria] || "";
-        left.appendChild(iconDiv);
-
-        const meta = document.createElement("div");
-        meta.className = "meta";
-
-        const title = document.createElement("div");
-        title.className = "title";
-        title.textContent = it.titulo || it.nome || "Sem título";
-        meta.appendChild(title);
-
-        const subtitle = document.createElement("div");
-        subtitle.className = "subtitle";
-        subtitle.textContent = it.autor ? it.autor : "";
-        meta.appendChild(subtitle);
-
-        const price = document.createElement("div");
-        price.className = "price";
-        price.textContent = formatCurrency(it.preco);
-        meta.appendChild(price);
-
-        left.appendChild(meta);
-        card.appendChild(left);
-
-       
-        const controlsWrap = document.createElement("div");
-        controlsWrap.style.display = "flex";
-        controlsWrap.style.alignItems = "center";
-        controlsWrap.style.gap = "12px";
-
-        const controls = document.createElement("div");
-        controls.className = "controls";
-
-        const btnDec = document.createElement("button");
-        btnDec.className = "qty-btn";
-        btnDec.textContent = "−";
-        btnDec.dataset.idx = idx;
-        btnDec.title = "Diminuir";
-        controls.appendChild(btnDec);
-
-        const inputQty = document.createElement("input");
-        inputQty.className = "qty-input";
-        inputQty.value = it.qtd;
-        inputQty.dataset.idx = idx;
-        inputQty.type = "number";
-        inputQty.min = "1";
-        controls.appendChild(inputQty);
-
-        const btnInc = document.createElement("button");
-        btnInc.className = "qty-btn";
-        btnInc.textContent = "+";
-        btnInc.dataset.idx = idx;
-        btnInc.title = "Aumentar";
-        controls.appendChild(btnInc);
-
-        controlsWrap.appendChild(controls);
-
-        const subtotal = document.createElement("div");
-        subtotal.className = "subtotal";
-        subtotal.textContent = formatCurrency((Number(it.preco) || 0) * (Number(it.qtd) || 0));
-        controlsWrap.appendChild(subtotal);
-
-        const trash = document.createElement("button");
-        trash.className = "trash";
-        trash.innerHTML = "🗑️";
-        trash.dataset.idx = idx;
-        controlsWrap.appendChild(trash);
-
-        card.appendChild(controlsWrap);
-        cartContainer.appendChild(card);
-      });
-
-      if (finalTotalEl) finalTotalEl.textContent = formatCurrency(cart.reduce((a,c) => a + (c.preco * c.qtd), 0));
-      if (checkoutSection) checkoutSection.style.display = "block";
-      if (cartItemCount) cartItemCount.textContent = String(cart.reduce((a,c) => a + (Number(c.qtd) || 0), 0));
+    if (!document.getElementById("cart-style")) {
+  const style = document.createElement("style");
+  style.id = "cart-style";
+  style.textContent = `
+    .controls .qty-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
+    .controls .qty-btn:first-child {
+      background-color: #e74c3c; /* botão - vermelho */
+    }
+    .controls .qty-btn:first-child:hover {
+      background-color: #c0392b;
+    }
+    .controls .qty-btn:last-child {
+      background-color: #3c0d0d; /* botão + vinho escuro */
+    }
+    .controls .qty-btn:last-child:hover {
+      background-color: #5a1818;
+    }
+    .controls .qty-input {
+      width: 42px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 3px;
+      font-weight: 600;
+    }
+    .trash {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background-color: rgba(255,0,0,0.1);
+      color: #e74c3c;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .trash:hover {
+      background-color: rgba(255,0,0,0.2);
+      color: #c0392b;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function updateCartUI() {
+  if (!cartContainer) return;
+  cartContainer.innerHTML = "";
+  if (!cart.length) {
+    cartContainer.innerHTML = `<div style="padding:14px;color:#666">Nenhum item no carrinho.</div>`;
+    if (finalTotalEl) finalTotalEl.textContent = formatCurrency(0);
+    if (checkoutSection) checkoutSection.style.display = "none";
+    if (cartItemCount) cartItemCount.textContent = "0";
+    return;
+  }
+
+  cart.forEach((it, idx) => {
+    const card = document.createElement("div");
+    card.className = "cart-card";
+
+    const left = document.createElement("div");
+    left.className = "left";
+
+    const iconDiv = document.createElement("div");
+    iconDiv.style.fontSize = "20px";
+    iconDiv.style.lineHeight = "1";
+    iconDiv.style.marginTop = "2px";
+    iconDiv.textContent = ICONS[it.categoria] || "";
+    left.appendChild(iconDiv);
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.textContent = it.titulo || it.nome || "Sem título";
+    meta.appendChild(title);
+
+    const subtitle = document.createElement("div");
+    subtitle.className = "subtitle";
+    subtitle.textContent = it.autor ? it.autor : "";
+    meta.appendChild(subtitle);
+
+    const price = document.createElement("div");
+    price.className = "price";
+    price.textContent = formatCurrency(it.preco);
+    meta.appendChild(price);
+
+    left.appendChild(meta);
+    card.appendChild(left);
+
+    const controlsWrap = document.createElement("div");
+    controlsWrap.style.display = "flex";
+    controlsWrap.style.alignItems = "center";
+    controlsWrap.style.gap = "12px";
+
+    const controls = document.createElement("div");
+    controls.className = "controls";
+
+    const btnDec = document.createElement("button");
+    btnDec.className = "qty-btn";
+    btnDec.textContent = "−";
+    btnDec.dataset.idx = idx;
+    btnDec.title = "Diminuir";
+    controls.appendChild(btnDec);
+
+    const inputQty = document.createElement("input");
+    inputQty.className = "qty-input";
+    inputQty.value = it.qtd;
+    inputQty.dataset.idx = idx;
+    inputQty.type = "number";
+    inputQty.min = "1";
+    controls.appendChild(inputQty);
+
+    const btnInc = document.createElement("button");
+    btnInc.className = "qty-btn";
+    btnInc.textContent = "+";
+    btnInc.dataset.idx = idx;
+    btnInc.title = "Aumentar";
+    controls.appendChild(btnInc);
+
+    controlsWrap.appendChild(controls);
+
+    const subtotal = document.createElement("div");
+    subtotal.className = "subtotal";
+    subtotal.textContent = formatCurrency((Number(it.preco) || 0) * (Number(it.qtd) || 0));
+    controlsWrap.appendChild(subtotal);
+
+    const trash = document.createElement("button");
+    trash.className = "trash";
+    trash.innerHTML = `<i class="fas fa-trash"></i>`;
+    trash.dataset.idx = idx;
+    controlsWrap.appendChild(trash);
+
+    card.appendChild(controlsWrap);
+    cartContainer.appendChild(card);
+  });
+
+  if (finalTotalEl) finalTotalEl.textContent = formatCurrency(cart.reduce((a, c) => a + (c.preco * c.qtd), 0));
+  if (checkoutSection) checkoutSection.style.display = "block";
+  if (cartItemCount) cartItemCount.textContent = String(cart.reduce((a, c) => a + (Number(c.qtd) || 0), 0));
+}
+
 
     function recalcTotal() {
       const subtotal = cart.reduce((a,c)=>a + (Number(c.preco||0) * Number(c.qtd||0)), 0);

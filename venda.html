@@ -390,10 +390,63 @@
 .delete-btn:hover, .cart-card .trash:hover { background:#f8d7da; }
 
 
+/* === Botões do carrinho (venda e empréstimos) === */
+.cart-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
+.cart-controls button {
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
+.cart-controls button.btn-minus {
+  background-color: #e74c3c; /* vermelho */
+}
 
-    </style>
+.cart-controls button.btn-minus:hover {
+  background-color: #c0392b;
+}
+
+.cart-controls button.btn-plus {
+  background-color: #3c0d0d; /* vinho/marrom escuro */
+}
+
+.cart-controls button.btn-plus:hover {
+  background-color: #5a1818;
+}
+
+.cart-controls input {
+  width: 40px;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 3px;
+}
+
+/* Ícone da lixeira */
+.cart-controls button.btn-delete {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #e74c3c;
+  font-size: 16px;
+}
+
+.cart-controls button.btn-delete:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+  color: #c0392b;
+}
+
+</style>
   </head>
   <body>
     <div id="dashboard" class="dashboard">
@@ -1358,94 +1411,7 @@
       </div>
     </div>
     <div id="toastContainer"></div>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Sidebar toggle
-        var sidebarToggle = document.getElementById("sidebarToggle");
-        var sidebar = document.getElementById("sidebar");
-        var mainContent = document.querySelector(".main-content");
-        if (sidebarToggle && sidebar && mainContent) {
-          sidebarToggle.addEventListener("click", function () {
-            sidebar.classList.toggle("collapsed");
-            mainContent.classList.toggle("sidebar-collapsed");
-            var icon = sidebarToggle.querySelector("i");
-            if (icon) {
-              icon.classList.toggle("fa-chevron-left");
-              icon.classList.toggle("fa-chevron-right");
-            }
-          });
-        }
-        // Mobile menu
-        var mobileBtn = document.getElementById("mobileMenuBtn");
-        if (mobileBtn && sidebar) {
-          mobileBtn.addEventListener("click", function () {
-            sidebar.classList.toggle("mobile-open");
-          });
-        }
-        // Modal openers by id mapping
-        var modalMap = {
-          addBookBtn: "bookModal",
-          addClientBtn: "clientModal",
-          addProductBtn: "productModal",
-          addUserBtn: "userModal",
-          editBookstoreBtn: "bookstoreModal",
-          processReturnBtn: "returnModal",
-        };
-        Object.keys(modalMap).forEach(function (k) {
-          var btn = document.getElementById(k);
-          if (btn) {
-            btn.addEventListener("click", function (e) {
-              e.preventDefault();
-              var m = document.getElementById(modalMap[k]);
-              if (m) m.classList.add("show");
-            });
-          }
-        });
-        // Close buttons and cancel buttons
-        document
-          .querySelectorAll('.close-btn, [id^="cancel"]')
-          .forEach(function (btn) {
-            btn.addEventListener("click", function () {
-              var modal = btn.closest(".modal");
-              if (modal) modal.classList.remove("show");
-            });
-          });
-        // Backdrop click to close
-        document.querySelectorAll(".modal").forEach(function (mod) {
-          mod.addEventListener("click", function (e) {
-            if (e.target === mod) mod.classList.remove("show");
-          });
-        });
-        // Escape key
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape")
-            document.querySelectorAll(".modal.show").forEach(function (m) {
-              m.classList.remove("show");
-            });
-        });
-        // Simple form submit handler -> close modal and show toast
-        function showToast(msg, type, dur) {
-          var t = document.createElement("div");
-          t.className = "toast show " + (type || "success");
-          t.textContent = msg;
-          document.body.appendChild(t);
-          setTimeout(function () {
-            t.classList.remove("show");
-            setTimeout(function () {
-              t.remove();
-            }, 300);
-          }, dur || 3000);
-        }
-        document.querySelectorAll("form").forEach(function (form) {
-          form.addEventListener("submit", function (e) {
-            e.preventDefault();
-            var m = form.closest(".modal");
-            if (m) m.classList.remove("show");
-            showToast("Operação realizada com sucesso");
-          });
-        });
-      });
-    </script>
+    
 
     <script src="venda.js"></script>
   </body>

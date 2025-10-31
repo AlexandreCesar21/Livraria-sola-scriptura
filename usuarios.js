@@ -7,6 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeModalBtn = document.getElementById("closeUserModal");
   const cancelBtn = document.getElementById("cancelUserBtn");
 
+  const confirmModal = document.getElementById("confirmModal");
+  const confirmTitle = document.getElementById("confirmTitle");
+  const confirmMessage = document.getElementById("confirmMessage");
+  const confirmCancel = document.getElementById("confirmCancel");
+  const confirmOk = document.getElementById("confirmOk");
+
   const nameInput = document.getElementById("userName");
   const emailInput = document.getElementById("userEmail");
   const passwordInput = document.getElementById("userPassword");
@@ -45,7 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
     form.reset();
     editId = null;
     form.querySelector("button[type='submit'] i").className = "fas fa-save";
-    form.querySelector("button[type='submit']").lastChild.textContent = " Salvar";
+    form.querySelector("button[type='submit']").lastChild.textContent =
+      " Salvar";
   };
 
   const toast = (msg, cor = "#3c0d00") => {
@@ -64,11 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 2500);
-  };
-
-  const formatarData = (data) => {
-    const d = new Date(data);
-    return d.toLocaleDateString("pt-BR");
   };
 
   function renderTabela() {
@@ -121,6 +123,23 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       tabelaBody.appendChild(tr);
     });
+  }
+
+  
+  function abrirConfirmModal(titulo, mensagem, onConfirm) {
+    confirmTitle.textContent = titulo;
+    confirmMessage.textContent = mensagem;
+    confirmModal.classList.add("show");
+
+    const fechar = () => confirmModal.classList.remove("show");
+
+    const confirmar = () => {
+      onConfirm();
+      fechar();
+    };
+
+    confirmCancel.onclick = fechar;
+    confirmOk.onclick = confirmar;
   }
 
   form.addEventListener("submit", (e) => {
@@ -184,7 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
         typeInput.value = user.tipo;
         statusInput.value = user.status;
         form.querySelector("button[type='submit'] i").className = "fas fa-sync";
-        form.querySelector("button[type='submit']").lastChild.textContent = " Atualizar";
+        form.querySelector("button[type='submit']").lastChild.textContent =
+          " Atualizar";
         abrirModal();
       }
     }
@@ -196,12 +216,17 @@ document.addEventListener("DOMContentLoaded", () => {
         toast("Esse usuário não pode ser excluído!", "#a00");
         return;
       }
-      if (confirm("Tem certeza que deseja excluir este usuário?")) {
-        usuarios = usuarios.filter((u) => u.id !== id);
-        salvarLocal();
-        renderTabela();
-        toast("Usuário excluído com sucesso!", "#a00");
-      }
+
+      abrirConfirmModal(
+        "Excluir Usuário",
+        "Tem certeza que deseja excluir este usuário?",
+        () => {
+          usuarios = usuarios.filter((u) => u.id !== id);
+          salvarLocal();
+          renderTabela();
+          toast("Usuário excluído com sucesso!", "#a00");
+        }
+      );
     }
   });
 
