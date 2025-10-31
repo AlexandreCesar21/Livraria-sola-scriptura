@@ -785,7 +785,7 @@
     <div id="toastContainer"></div>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // Sidebar toggle
+        
         var sidebarToggle = document.getElementById("sidebarToggle");
         var sidebar = document.getElementById("sidebar");
         var mainContent = document.querySelector(".main-content");
@@ -800,14 +800,14 @@
             }
           });
         }
-        // Mobile menu
+  
         var mobileBtn = document.getElementById("mobileMenuBtn");
         if (mobileBtn && sidebar) {
           mobileBtn.addEventListener("click", function () {
             sidebar.classList.toggle("mobile-open");
           });
         }
-        // Modal openers by id mapping
+        
         var modalMap = {
           addBookBtn: "bookModal",
           addClientBtn: "clientModal",
@@ -826,7 +826,7 @@
             });
           }
         });
-        // Close buttons and cancel buttons
+        
         document
           .querySelectorAll('.close-btn, [id^="cancel"]')
           .forEach(function (btn) {
@@ -835,20 +835,20 @@
               if (modal) modal.classList.remove("show");
             });
           });
-        // Backdrop click to close
+    
         document.querySelectorAll(".modal").forEach(function (mod) {
           mod.addEventListener("click", function (e) {
             if (e.target === mod) mod.classList.remove("show");
           });
         });
-        // Escape key
+        
         document.addEventListener("keydown", function (e) {
           if (e.key === "Escape")
             document.querySelectorAll(".modal.show").forEach(function (m) {
               m.classList.remove("show");
             });
         });
-        // Simple form submit handler -> close modal and show toast
+        
         function showToast(msg, type, dur) {
           var t = document.createElement("div");
           t.className = "toast show " + (type || "success");

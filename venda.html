@@ -324,6 +324,74 @@
 
 
 
+.cart-item-card, .cart-card {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.06);
+  border:1px solid rgba(0,0,0,0.04);
+  margin-bottom:12px;
+  font-family:'Poppins',sans-serif;
+}
+
+.cart-item-card .left, .cart-card .left {
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  flex:1;
+}
+.cart-item-card .meta, .cart-card .meta {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.cart-item-card .title, .cart-card .title {
+  font-weight:700;
+  font-size:15px;
+  color:#111;
+}
+.cart-item-card .subtitle, .cart-card .subtitle {
+  font-size:13px;
+  color:#666;
+}
+.cart-item-card .info-line, .cart-card .info-line {
+  font-size:13px;
+  color:#3c0d0d;
+  font-weight:500;
+}
+
+
+.cart-item-card .controls, .cart-card .controls {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.qty-btn, .cart-card .qty-btn {
+  width:32px;height:32px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);background:#fafafa;cursor:pointer;font-size:18px;
+}
+.qty-btn.minus, .cart-card .qty-btn.minus { background:#e53935; color:#fff; border-color: rgba(0,0,0,0.06); }
+.qty-btn.plus, .cart-card .qty-btn.plus { background:#3c0d0d; color:#fff; border-color: rgba(0,0,0,0.06); }
+.qty-input, .cart-card .qty-input {
+  width:56px;height:32px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);text-align:center;font-weight:600;
+}
+
+
+.subtotal, .cart-card .subtotal {
+  min-width:120px;text-align:right;font-weight:700;color:#3c0d0d;font-size:14px;
+}
+.subtotal small, .cart-card .subtotal small { display:block;font-size:12px;color:#444;font-weight:600; }
+.delete-btn, .cart-card .trash {
+  width:36px;height:36px;border-radius:50%;border:none;background:#fdecea;color:#e53935;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.delete-btn:hover, .cart-card .trash:hover { background:#f8d7da; }
+
+
+
+
 
     </style>
   </head>

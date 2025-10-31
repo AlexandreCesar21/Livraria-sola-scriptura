@@ -1,515 +1,745 @@
 
-
 document.addEventListener("DOMContentLoaded", () => {
   try {
-    
     const $ = id => document.getElementById(id);
-    const cartBookSelect = $("cartBookSelect");
-    const cartQuantity = $("cartQuantity");
-    const addToCartBtn = $("addToCartBtn");
-    const cartItemsContainer = $("cartItems");
-    const clearCartBtn = $("clearCartBtn");
-    const checkoutSection = $("checkoutSection");
-    const checkoutClientSelect = $("checkoutClientSelect");
-    const checkoutPaymentMethod = $("checkoutPaymentMethod");
-    const checkoutDiscount = $("checkoutDiscount");
-    const checkoutNotes = $("checkoutNotes");
-    const checkoutForm = $("checkoutForm");
-    const finalTotalSpan = $("finalTotal");
-    const cartItemCount = $("cartItemCount");
-    const salesTableBody = $("salesTableBody");
-    const returnsTableBody = $("returnsTableBody");
 
+    
+    const KEY_BOOKS = "livraria_books";
+    const KEY_PRODUCTS = "produtosDiversos";
+    const KEY_CLIENTS = "livraria_clients";
+    const KEY_SALES = "livraria_sales";
+    const KEY_RETURNS = "livraria_returns";
+
+    const THEME_COLOR = "#3c0d0d"; 
+    const ICONS = {
+      "LIVROS": "📚",
+      "PRODUTOS DIVERSOS": "🎁",
+      "PAPELARIA": "🖊️",
+      "ELETRÔNICOS": "💻"
+    };
+
+    const formatCurrency = v => "R$ " + Number(v || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+    const formatDate = d => { try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d || "—"; } };
+    const formatTime = d => { try { return new Date(d).toLocaleTimeString("pt-BR"); } catch { return ""; } };
+
+    
+    const selectEl = $("cartBookSelect");
+    const qtyEl = $("cartQuantity");
+    const addBtn = $("addToCartBtn");
+    const cartContainer = $("cartItems");
+    const clearBtn = $("clearCartBtn");
+    const checkoutForm = $("checkoutForm");
+    const clientSelect = $("checkoutClientSelect");
+    const paymentSelect = $("checkoutPaymentMethod");
+    const discountEl = $("checkoutDiscount");
+    const finalTotalEl = $("finalTotal");
+    const checkoutSection = $("checkoutSection");
+    const cartItemCount = $("cartItemCount");
+    const salesTable = $("salesTableBody");
+    const returnsTable = $("returnsTableBody");
     const processReturnBtn = $("processReturnBtn");
     const returnModal = $("returnModal");
-    const closeReturnModal = $("closeReturnModal");
-    const cancelReturnBtn = $("cancelReturnBtn");
-    const saleSelect = $("returnSaleSelect");
+    const returnSaleSelect = $("returnSaleSelect");
     const returnForm = $("returnForm");
-    const returnNotes = $("returnNotes");
     const exchangeBookSelect = $("exchangeBookSelect");
     const returnType = $("returnType");
     const returnQuantity = $("returnQuantity");
-    const returnReason = $("returnReason");
+    const returnNotes = $("returnNotes");
 
     
-    const filterIds = ["filterSalesDateFrom","filterSalesDateTo","filterSalesCategory","filterSalesAuthor","filterSalesPublisher","filterSalesClient"];
+    function allBooks(){ return JSON.parse(localStorage.getItem(KEY_BOOKS) || "[]"); }
+    function allProducts(){ return JSON.parse(localStorage.getItem(KEY_PRODUCTS) || "[]"); }
+    function allClients(){ return JSON.parse(localStorage.getItem(KEY_CLIENTS) || "[]"); }
+    function allSales(){ return JSON.parse(localStorage.getItem(KEY_SALES) || "[]"); }
+    function allReturns(){ return JSON.parse(localStorage.getItem(KEY_RETURNS) || "[]"); }
 
-    
-    let books = JSON.parse(localStorage.getItem("livraria_books")) || [];
-    let clients = JSON.parse(localStorage.getItem("livraria_clients")) || [];
-    let sales = JSON.parse(localStorage.getItem("livraria_sales")) || [];
-    let returns = JSON.parse(localStorage.getItem("livraria_returns")) || [];
-    
-    const allSales = () => JSON.parse(localStorage.getItem("livraria_sales")) || sales;
-    const allBooks = () => JSON.parse(localStorage.getItem("livraria_books")) || books;
-    const allClients = () => JSON.parse(localStorage.getItem("livraria_clients")) || clients;
+    function saveBooks(v){ localStorage.setItem(KEY_BOOKS, JSON.stringify(v)); }
+    function saveProducts(v){ localStorage.setItem(KEY_PRODUCTS, JSON.stringify(v)); }
+    function saveSales(v){ localStorage.setItem(KEY_SALES, JSON.stringify(v)); }
+    function saveReturns(v){ localStorage.setItem(KEY_RETURNS, JSON.stringify(v)); }
 
-    
-    const formatCurrency = v => "R$ " + Number(v).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
-    const formatDate = d => {
-      try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d; }
-    };
-    const formatTime = d => {
-      try { return new Date(d).toLocaleTimeString("pt-BR"); } catch { return ""; }
-    };
 
-    function saveBooks() { localStorage.setItem("livraria_books", JSON.stringify(books)); }
-    function saveClients() { localStorage.setItem("livraria_clients", JSON.stringify(clients)); }
-    function saveSales() { localStorage.setItem("livraria_sales", JSON.stringify(sales)); }
-    function saveReturns() { localStorage.setItem("livraria_returns", JSON.stringify(returns)); }
-
-    function showToast(msg) {
+    function normalizeCategory(raw) {
+      if (!raw && raw !== 0) return "";
       try {
-        document.querySelectorAll(".toast-success").forEach(t => t.remove());
-        const toast = document.createElement("div");
-        toast.className = "toast-success";
-        toast.innerHTML = `<span class="toast-message">${msg}</span>`;
-        Object.assign(toast.style, { position:"fixed", right:"20px", bottom:"20px", background:"#1f8f4b", color:"#fff", padding:"8px 12px", borderRadius:"8px", zIndex:99999 });
-        document.body.appendChild(toast);
-        setTimeout(() => toast.style.opacity = "1", 50);
-        setTimeout(() => { toast.style.opacity = "0"; setTimeout(()=>toast.remove(),300); }, 2600);
-      } catch(e) { console.warn("Toast erro:", e); }
+        if (typeof raw === "string") return raw.trim().toUpperCase();
+        if (typeof raw === "number") return String(raw);
+        if (typeof raw === "object") {
+          const tryKeys = ["categoria","category","genero","cat","categoriaNome","categoria_nome","tipo"];
+          for (let k of tryKeys) {
+            if (raw[k]) return String(raw[k]).trim().toUpperCase();
+          }
+          if (raw.label) return String(raw.label).trim().toUpperCase();
+          if (raw.name) return String(raw.name).trim().toUpperCase();
+        }
+      } catch(e){}
+      return "";
     }
 
    
-    function populateBookSelect() {
-      books = allBooks();
-      if (!cartBookSelect) return;
-      cartBookSelect.innerHTML = `<option value="">Selecione um livro disponível</option>`;
-      books.filter(b => (b.status||"").toUpperCase() === "ATIVO" || !b.status)
-        .forEach(b => {
-          const titulo = b.titulo || b.title || "Sem título";
-          const autor = b.autor || b.author || "Autor desconhecido";
-          const preco = b.preco || b.value || b.valor || 0;
-          const opt = document.createElement("option");
-          opt.value = String(b.id);
-          opt.textContent = `${titulo} — ${autor} — ${formatCurrency(preco)}`;
-          cartBookSelect.appendChild(opt);
-        });
+    function toast(message, type = "sucesso") {
+      document.querySelectorAll(".v-toast").forEach(t => t.remove());
+      const el = document.createElement("div");
+      el.className = `v-toast ${type}`;
+      el.innerHTML = `<strong>${type==="sucesso" ? "✔" : "✖"}</strong><span style="margin-left:8px">${message}</span>`;
+      document.body.appendChild(el);
+      requestAnimationFrame(() => el.classList.add("show"));
+      setTimeout(() => { el.classList.remove("show"); setTimeout(()=>el.remove(), 300); }, 3500);
+      if (!document.getElementById("v-toast-styles")) {
+        const s = document.createElement("style");
+        s.id = "v-toast-styles";
+        s.innerHTML = `
+          .v-toast{position:fixed;top:18px;right:18px;background:${THEME_COLOR};color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.18);opacity:0;transform:translateY(-8px);transition:all .28s;font-weight:600;z-index:99999}
+          .v-toast.show{opacity:1;transform:translateY(0)}
+          .v-toast.erro{background:#b91c1c}
+          .v-toast strong{margin-right:8px}
+        `;
+        document.head.appendChild(s);
+      }
     }
 
-    function populateClientSelect() {
-      clients = allClients();
-      if (!checkoutClientSelect) return;
-      checkoutClientSelect.innerHTML = `<option value="">Selecione o cliente</option>`;
-      clients.filter(c => (c.status||"").toUpperCase()==="ATIVO" || !c.status)
-        .forEach(c => {
-          const opt = document.createElement("option");
-          opt.value = String(c.id);
-          opt.textContent = c.nome || c.name || "Cliente sem nome";
-          checkoutClientSelect.appendChild(opt);
-        });
-    }
+    
+    (function injectCartStyles(){
+      if (document.getElementById("v-cart-styles")) return;
+      const s = document.createElement("style");
+      s.id = "v-cart-styles";
+      s.innerHTML = `
+        /* Select styling */
+        select#cartBookSelect{width:100%;padding:12px 14px;border:2px solid ${THEME_COLOR};border-radius:10px;background:#fff;font-family:'Poppins',sans-serif;font-size:15px;color:#3b1a1a}
+        select#cartBookSelect:focus{outline:none;box-shadow:0 0 0 4px rgba(60,13,13,0.08);border-color:${THEME_COLOR}}
+        select#cartBookSelect optgroup{font-weight:800;color:${THEME_COLOR};font-size:13px;text-transform:uppercase}
+        select#cartBookSelect option{padding:8px;font-size:14px;line-height:1.6;color:#222}
 
-    function populateExchangeBookSelect() {
-      if (!exchangeBookSelect) return;
-      exchangeBookSelect.innerHTML = `<option value="">Selecione um livro para troca</option>`;
-      allBooks().forEach(b => {
-        const opt = document.createElement("option");
-        opt.value = String(b.id);
-        opt.textContent = `${b.titulo || b.title || "Sem título"} — ${b.autor || b.author || ""}`;
-        exchangeBookSelect.appendChild(opt);
+        /* Cart item card */
+        .cart-card {
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          padding:12px;
+          background:#fff;
+          border-radius:12px;
+          box-shadow:0 6px 18px rgba(0,0,0,0.06);
+          border:1px solid rgba(0,0,0,0.04);
+          margin-bottom:12px;
+          font-family:'Poppins',sans-serif;
+        }
+        .cart-card .left {
+          display:flex;
+          gap:12px;
+          align-items:flex-start;
+          flex:1;
+        }
+        .cart-card .meta {
+          display:flex;
+          flex-direction:column;
+          gap:6px;
+        }
+        .cart-card .title {
+          font-weight:700;
+          font-size:15px;
+          color:#111;
+        }
+        .cart-card .subtitle {
+          font-size:13px;
+          color:#666;
+        }
+        .cart-card .price {
+          font-weight:700;
+          color:${THEME_COLOR};
+          font-size:14px;
+        }
+        .cart-card .controls {
+          display:flex;
+          align-items:center;
+          gap:8px;
+        }
+        .cart-card .qty-btn {
+          width:32px;height:32px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);background:#fafafa;cursor:pointer;font-size:18px;
+        }
+        .cart-card .qty-input {
+          width:56px;height:32px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);text-align:center;font-weight:600;
+        }
+        .cart-card .subtotal {
+          min-width:110px;text-align:right;font-weight:700;
+        }
+        .cart-card .trash {
+          background:none;border:none;cursor:pointer;font-size:18px;color:#b91c1c;margin-left:8px;
+        }
+      `;
+      document.head.appendChild(s);
+    })();
+
+    
+    function populateSelect() {
+      if (!selectEl) return;
+      selectEl.innerHTML = `<option value="">Selecione um item disponível</option>`;
+      const books = allBooks().map(b => ({
+        origem: "BOOK",
+        id: String(b.id),
+        nome: b.titulo || b.title || b.name || "Sem título",
+        autor: b.autor || b.author || "",
+        preco: Number(b.preco || b.value || b.valor || 0),
+        estoque: Number(b.quantidade || b.quantity || b.stock || 0),
+        categoria: normalizeCategory(b.categoria || b.category || b.genero || b.categoriaNome || b.categoria_nome || "LIVROS"),
+        editora: b.editora || b.publisher || ""
+      }));
+      const products = allProducts().map(p => ({
+        origem: "PRODUCT",
+        id: String(p.id),
+        nome: p.nome || p.name || "Sem nome",
+        autor: p.marca || p.brand || "",
+        preco: Number(p.preco || p.value || p.valor || 0),
+        estoque: Number(p.quantidade || p.quantity || p.stock || 0),
+        categoria: normalizeCategory(p.categoria || p.category || p.genero || p.categoriaNome || p.categoria_nome || "PRODUTOS DIVERSOS"),
+        editora: p.editora || p.publisher || ""
+      }));
+      const all = [...books, ...products];
+      const order = ["LIVROS", "PAPELARIA", "PRODUTOS DIVERSOS", "ELETRÔNICOS"];
+      const categories = [...new Set(all.map(x => x.categoria))].sort((a,b)=>{
+        const ia = order.indexOf(a), ib = order.indexOf(b);
+        if (ia === -1 && ib === -1) return a.localeCompare(b);
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+      });
+      categories.forEach(cat => {
+        const optg = document.createElement("optgroup");
+        optg.label = cat;
+        all.filter(x => x.categoria === cat).forEach(item => {
+          const opt = document.createElement("option");
+          opt.value = `${item.origem}::${item.id}`;
+          opt.dataset.origem = item.origem;
+          opt.dataset.id = item.id;
+          opt.dataset.preco = item.preco;
+          opt.dataset.estoque = item.estoque;
+          let text = "";
+          if (item.origem === "BOOK") {
+            text = `${item.nome}${item.autor ? " - " + item.autor : ""} (Estoque: ${item.estoque}) - ${formatCurrency(item.preco)}`;
+          } else {
+            const emoji = ICONS[item.categoria] || "📦";
+            text = `${emoji} ${item.nome}${item.autor ? " - " + item.autor : ""} (Estoque: ${item.estoque}) - ${formatCurrency(item.preco)}`;
+          }
+          opt.textContent = text;
+          optg.appendChild(opt);
+        });
+        selectEl.appendChild(optg);
       });
     }
 
-    function populateFilterClients() {
-      const select = document.getElementById("filterSalesClient");
-      if (!select) return;
-      select.innerHTML = `<option value="">Todos os clientes</option>`;
-      allClients().forEach(c => {
-        const opt = document.createElement("option");
-        opt.value = String(c.id);
-        opt.textContent = c.nome || c.name || "Cliente";
-        select.appendChild(opt);
-      });
-    }
-
-    let cart = []; 
+    let cart = [];
 
     function updateCartUI() {
-      if (!cartItemsContainer) return;
-      cartItemsContainer.innerHTML = "";
-      if (cartItemCount) cartItemCount.textContent = cart.reduce((a,c)=>a+c.qtd,0);
-
+      if (!cartContainer) return;
+      cartContainer.innerHTML = "";
       if (!cart.length) {
-        cartItemsContainer.innerHTML = `<div style="padding:16px;color:#777">Nenhum item no carrinho.</div>`;
+        cartContainer.innerHTML = `<div style="padding:14px;color:#666">Nenhum item no carrinho.</div>`;
+        if (finalTotalEl) finalTotalEl.textContent = formatCurrency(0);
         if (checkoutSection) checkoutSection.style.display = "none";
-        if (finalTotalSpan) finalTotalSpan.textContent = "R$ 0,00";
+        if (cartItemCount) cartItemCount.textContent = "0";
         return;
       }
 
+      
       cart.forEach((it, idx) => {
-        const el = document.createElement("div");
-        el.className = "cart-item-card";
-        el.innerHTML = `
-          <div style="flex:1">
-            <strong>${it.titulo}</strong><br><small>${it.autor||""}</small>
-            <div style="margin-top:6px;color:#666">Preço: ${formatCurrency(it.preco)} • Estoque: ${it.estoque||0}</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button class="btn-decrease" data-idx="${idx}">−</button>
-            <input class="cart-qty-input" value="${it.qtd}" style="width:48px;text-align:center" />
-            <button class="btn-increase" data-idx="${idx}">+</button>
-            <button class="btn-delete" data-idx="${idx}" title="Remover">🗑️</button>
-          </div>
-        `;
-        cartItemsContainer.appendChild(el);
+        const card = document.createElement("div");
+        card.className = "cart-card";
+
+        
+        const left = document.createElement("div");
+        left.className = "left";
+
+        
+        const iconDiv = document.createElement("div");
+        iconDiv.style.fontSize = "20px";
+        iconDiv.style.lineHeight = "1";
+        iconDiv.style.marginTop = "2px";
+        iconDiv.textContent = ICONS[it.categoria] || "";
+        left.appendChild(iconDiv);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+
+        const title = document.createElement("div");
+        title.className = "title";
+        title.textContent = it.titulo || it.nome || "Sem título";
+        meta.appendChild(title);
+
+        const subtitle = document.createElement("div");
+        subtitle.className = "subtitle";
+        subtitle.textContent = it.autor ? it.autor : "";
+        meta.appendChild(subtitle);
+
+        const price = document.createElement("div");
+        price.className = "price";
+        price.textContent = formatCurrency(it.preco);
+        meta.appendChild(price);
+
+        left.appendChild(meta);
+        card.appendChild(left);
+
+       
+        const controlsWrap = document.createElement("div");
+        controlsWrap.style.display = "flex";
+        controlsWrap.style.alignItems = "center";
+        controlsWrap.style.gap = "12px";
+
+        const controls = document.createElement("div");
+        controls.className = "controls";
+
+        const btnDec = document.createElement("button");
+        btnDec.className = "qty-btn";
+        btnDec.textContent = "−";
+        btnDec.dataset.idx = idx;
+        btnDec.title = "Diminuir";
+        controls.appendChild(btnDec);
+
+        const inputQty = document.createElement("input");
+        inputQty.className = "qty-input";
+        inputQty.value = it.qtd;
+        inputQty.dataset.idx = idx;
+        inputQty.type = "number";
+        inputQty.min = "1";
+        controls.appendChild(inputQty);
+
+        const btnInc = document.createElement("button");
+        btnInc.className = "qty-btn";
+        btnInc.textContent = "+";
+        btnInc.dataset.idx = idx;
+        btnInc.title = "Aumentar";
+        controls.appendChild(btnInc);
+
+        controlsWrap.appendChild(controls);
+
+        const subtotal = document.createElement("div");
+        subtotal.className = "subtotal";
+        subtotal.textContent = formatCurrency((Number(it.preco) || 0) * (Number(it.qtd) || 0));
+        controlsWrap.appendChild(subtotal);
+
+        const trash = document.createElement("button");
+        trash.className = "trash";
+        trash.innerHTML = "🗑️";
+        trash.dataset.idx = idx;
+        controlsWrap.appendChild(trash);
+
+        card.appendChild(controlsWrap);
+        cartContainer.appendChild(card);
       });
 
+      if (finalTotalEl) finalTotalEl.textContent = formatCurrency(cart.reduce((a,c) => a + (c.preco * c.qtd), 0));
       if (checkoutSection) checkoutSection.style.display = "block";
-      recalcFinalTotal();
+      if (cartItemCount) cartItemCount.textContent = String(cart.reduce((a,c) => a + (Number(c.qtd) || 0), 0));
     }
 
-    function recalcFinalTotal() {
-      const subtotal = cart.reduce((a,it)=>a + (it.preco * it.qtd), 0);
-      const desconto = Number(checkoutDiscount?.value) || 0;
+    function recalcTotal() {
+      const subtotal = cart.reduce((a,c)=>a + (Number(c.preco||0) * Number(c.qtd||0)), 0);
+      const desconto = Number(discountEl?.value) || 0;
       const total = subtotal - (subtotal * desconto / 100);
-      if (finalTotalSpan) finalTotalSpan.textContent = formatCurrency(total);
+      if (finalTotalEl) finalTotalEl.textContent = formatCurrency(total);
       return total;
     }
 
-    
-    addToCartBtn && addToCartBtn.addEventListener("click", () => {
-      const id = cartBookSelect ? cartBookSelect.value : null;
-      const qtd = Number(cartQuantity ? cartQuantity.value : 0) || 0;
-      if (!id || qtd <= 0) { showToast("Selecione livro e quantidade"); return; }
-      const b = allBooks().find(x => String(x.id) === String(id));
-      if (!b) { showToast("Livro não encontrado"); return; }
-      const existing = cart.find(i => String(i.id) === String(id));
-      if (existing) existing.qtd += qtd;
-      else cart.push({ id: String(b.id), titulo: b.titulo||b.title||"Sem título", autor: b.autor||b.author, preco: b.preco||b.value||b.valor||0, qtd, estoque: b.quantidade||b.stock||0 });
-      cartBookSelect && (cartBookSelect.value = "");
-      cartQuantity && (cartQuantity.value = "");
+    addBtn && addBtn.addEventListener("click", () => {
+      if (!selectEl) { toast("Seletor ausente","erro"); return; }
+      const val = selectEl.value;
+      const qtd = Number(qtyEl?.value || 0);
+      if (!val || qtd <= 0) { toast("Selecione item e quantidade válidos","erro"); return; }
+      const [orig, id] = val.split("::");
+      let item = null;
+      if (orig === "BOOK") {
+        const b = allBooks().find(x=>String(x.id)===String(id));
+        if (b) item = { origem:"BOOK", id:String(b.id), titulo:b.titulo||b.title||b.name||"Sem título", autor:b.autor||b.author||"", preco:Number(b.preco||b.valor||b.value||0), estoque:Number(b.quantidade||b.quantity||b.stock||0), categoria: normalizeCategory(b.categoria || b.category || "LIVROS"), editora: b.editora || b.publisher || "" };
+      } else {
+        const p = allProducts().find(x=>String(x.id)===String(id));
+        if (p) item = { origem:"PRODUCT", id:String(p.id), titulo:p.nome||p.name||"Sem nome", autor:p.marca||p.brand||"", preco:Number(p.preco||p.valor||p.value||0), estoque:Number(p.quantidade||p.quantity||p.stock||0), categoria: normalizeCategory(p.categoria || p.category || "PRODUTOS DIVERSOS"), editora: p.editora || p.publisher || "" };
+      }
+      if (!item) { toast("Item não encontrado","erro"); return; }
+      if (qtd > item.estoque) { toast("Quantidade maior que estoque disponível","erro"); return; }
+      const existing = cart.find(i=>i.origem===item.origem && String(i.id)===String(item.id));
+      if (existing) {
+        if (existing.qtd + qtd > item.estoque) { toast("Excede estoque disponível","erro"); return; }
+        existing.qtd += qtd;
+      } else {
+        cart.push({...item, qtd});
+      }
+      selectEl.value = "";
+      if (qtyEl) qtyEl.value = "";
       updateCartUI();
-      showToast("Livro adicionado ao carrinho");
+      toast("Item adicionado ao carrinho","sucesso");
     });
 
     
-    clearCartBtn && clearCartBtn.addEventListener("click", () => {
-      cart = [];
-      updateCartUI();
-      showToast("Carrinho limpo");
-    });
-
-    
-    cartItemsContainer && cartItemsContainer.addEventListener("click", (ev) => {
-      const dec = ev.target.closest(".btn-decrease");
-      const inc = ev.target.closest(".btn-increase");
-      const del = ev.target.closest(".btn-delete");
-      if (dec) {
-        const i = Number(dec.dataset.idx);
-        if (cart[i]) cart[i].qtd = Math.max(1, cart[i].qtd - 1);
-        updateCartUI();
-      } else if (inc) {
-        const i = Number(inc.dataset.idx);
-        if (cart[i]) cart[i].qtd = cart[i].qtd + 1;
-        updateCartUI();
-      } else if (del) {
-        const i = Number(del.dataset.idx);
-        if (cart[i]) cart.splice(i,1);
-        updateCartUI();
-      }
-    });
-
-    cartItemsContainer && cartItemsContainer.addEventListener("change", (ev) => {
-      const input = ev.target;
-      if (input.classList && input.classList.contains("cart-qty-input")) {
-        const card = input.closest(".cart-item-card");
-        const idx = Array.from(cartItemsContainer.children).indexOf(card);
-        if (idx >= 0 && cart[idx]) {
-          cart[idx].qtd = Math.max(1, Number(input.value) || 1);
-          updateCartUI();
-        }
-      }
-    });
-
-  
-    checkoutForm && checkoutForm.addEventListener("submit", (ev) => {
-      ev.preventDefault();
-      if (!cart.length) { showToast("Carrinho vazio"); return; }
-      const clienteId = checkoutClientSelect ? checkoutClientSelect.value : null;
-      if (!clienteId) { showToast("Selecione o cliente"); return; }
-      const pagamento = checkoutPaymentMethod ? checkoutPaymentMethod.value : "";
-      if (!pagamento) { showToast("Selecione forma de pagamento"); return; }
-      const desconto = Number(checkoutDiscount?.value) || 0;
-      const total = recalcFinalTotal();
-      const venda = {
-        id: Date.now(),
-        data: new Date().toISOString(),
-        clienteId,
-        pagamento,
-        desconto,
-        total,
-        status: "ATIVA",
-        itens: cart.map(c => ({ id: c.id, titulo: c.titulo, qtd: c.qtd, preco: c.preco }))
-      };
-      sales.unshift(venda);
-      saveSales();
-      cart = []; updateCartUI();
-      checkoutForm.reset();
-      if (checkoutSection) checkoutSection.style.display = "none";
-      renderSalesTable();
-      showToast("Venda concluída com sucesso!");
-    });
-
-    
-    function renderSalesTable(dataArray) {
-      const arr = Array.isArray(dataArray) ? dataArray : (allSales() || []);
-      if (!sales || sales.length === 0) {
-        // If no global sales, fallback to local storage arr
-        if (!arr.length && sales.length === 0 && !arr.length) {
-          if (salesTableBody) salesTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#999;">Nenhuma venda registrada</td></tr>`;
-          return;
-        }
-      }
+    cartContainer && cartContainer.addEventListener("click", (e) => {
+      const dec = e.target.closest(".qty-btn");
+      const inc = e.target.closest(".qty-btn");
+      const rm = e.target.closest(".trash");
       
-      const toUse = Array.isArray(dataArray) ? dataArray : sales;
-      if (!salesTableBody) return;
-      salesTableBody.innerHTML = "";
-      if (!toUse || toUse.length === 0) {
-        salesTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#999;">Nenhuma venda encontrada</td></tr>`;
+      if (dec && dec.textContent.trim() === "−") {
+        const i = Number(dec.dataset.idx);
+        if (cart[i]) { cart[i].qtd = Math.max(1, cart[i].qtd - 1); updateCartUI(); }
         return;
       }
-      toUse.forEach(s => {
-        const cliente = (allClients() || clients).find(c => String(c.id) === String(s.clienteId));
-        const nomeCliente = cliente ? (cliente.nome || cliente.name) : "—";
-        const item = s.itens && s.itens[0];
-        const titulo = item?.titulo || "Item sem título";
-        const autor = item?.autor || "Autor desconhecido";
-        const qtdTotal = s.itens ? s.itens.reduce((a,i)=>a+i.qtd,0) : 0;
-        // pagamento label + emoji
-        const tipo = (s.pagamento || "").toLowerCase().replace(/_/g," ");
-        let icon="💵", label=s.pagamento || "";
-        if (tipo.includes("credito")) { icon="💳"; label="Crédito"; }
-        else if (tipo.includes("debito")) { icon="💳"; label="Débito"; }
-        else if (tipo.includes("pix")) { icon="📱"; label="Pix"; }
-        else if (tipo.includes("transfer")) { icon="🏦"; label="Transferência"; }
-        else if (tipo.includes("cheque")) { icon="📄"; label="Cheque"; }
-        else if (tipo.includes("dinheiro")) { icon="💵"; label="Dinheiro"; }
+      if (inc && inc.textContent.trim() === "+") {
+        const i = Number(inc.dataset.idx);
+        if (cart[i]) {
+          if (cart[i].qtd + 1 > cart[i].estoque) { toast("Excede estoque disponível","erro"); return; }
+          cart[i].qtd += 1; updateCartUI();
+        }
+        return;
+      }
+      if (rm) {
+        const i = Number(rm.dataset.idx);
+        if (cart[i]) { cart.splice(i,1); updateCartUI(); toast("Item removido","sucesso"); }
+        return;
+      }
+    });
 
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><div>${formatDate(s.data)}</div><small>${formatTime(s.data)}</small></td>
-          <td><strong>${titulo}</strong><br><small>${autor}</small></td>
-          <td>${nomeCliente}</td>
-          <td>${qtdTotal}</td>
-          <td><span class="payment-badge">${icon} ${label}</span></td>
-          <td><strong>${formatCurrency(s.total)}</strong></td>
-          <td><span class="status-badge ${s.status === "ATIVA" ? "ativa" : "inativa"}">${s.status}</span></td>
-          <td><button class="btn-action" data-sale-id="${s.id}">🔁</button></td>
-        `;
-        salesTableBody.appendChild(tr);
+    
+    cartContainer && cartContainer.addEventListener("change", (e) => {
+      const input = e.target;
+      if (input.classList && input.classList.contains("qty-input")) {
+        const idx = Number(input.dataset.idx);
+        if (isNaN(idx)) return;
+        const val = Math.max(1, Number(input.value) || 1);
+        const estoque = Number(cart[idx].estoque || 0);
+        cart[idx].qtd = Math.min(val, estoque);
+        updateCartUI();
+      }
+    });
+
+    clearBtn && clearBtn.addEventListener("click", () => { cart = []; updateCartUI(); toast("Carrinho limpo","sucesso"); });
+
+    
+function getCategoryForItem(item) {
+  
+  if (!item) return "";
+  if (item.categoria) return normalizeCategory(item.categoria);
+  if (item.category) return normalizeCategory(item.category);
+
+  if (item.genero) return normalizeCategory(item.genero);
+  if (item.tipo) return normalizeCategory(item.tipo);
+
+
+  try {
+    const origem = item.origem || item.source || "";
+    const id = item.id || item.bookId || item.productId || item.idProduto;
+    if (!id) return "";
+
+    if (String(origem).toUpperCase().includes("BOOK") || origem === "BOOK") {
+      const b = allBooks().find(x => String(x.id) === String(id));
+      if (b) return normalizeCategory(b.categoria || b.category || b.genero || "");
+    }
+   
+    const p = allProducts().find(x => String(x.id) === String(id));
+    if (p) return normalizeCategory(p.categoria || p.category || p.genero || "");
+  } catch (e) {
+    console.warn("getCategoryForItem error:", e);
+  }
+  return "";
+}
+
+
+window.applySalesFilter = function () {
+  const dateFrom = document.getElementById("filterSalesDateFrom")?.value || "";
+  const dateTo = document.getElementById("filterSalesDateTo")?.value || "";
+  const category = document.getElementById("filterSalesCategory")?.value || "";
+  const author = document.getElementById("filterSalesAuthor")?.value?.toLowerCase() || "";
+  const publisher = document.getElementById("filterSalesPublisher")?.value?.toLowerCase() || "";
+  const client = document.getElementById("filterSalesClient")?.value || "";
+
+  let vendas = allSales();
+  if (!vendas.length) {
+    renderSalesTable([]);
+    return;
+  }
+
+  const dataIni = dateFrom ? new Date(dateFrom + "T00:00:00") : null;
+  const dataFim = dateTo ? new Date(dateTo + "T23:59:59") : null;
+  const filtroCategoria = normalizeCategory(category);
+
+  const filtradas = vendas.filter(v => {
+    const d = new Date(v.data);
+
+    
+    if (dataIni && d < dataIni) return false;
+    if (dataFim && d > dataFim) return false;
+
+    
+    if (client && String(v.clienteId) !== String(client)) return false;
+
+    
+    const itens = v.itens || [];
+
+    
+    if (filtroCategoria) {
+      const matchCat = itens.some(i => {
+        const catItem = getCategoryForItem(i);
+        return catItem && catItem === filtroCategoria;
       });
+      if (!matchCat) return false;
+    }
 
-      
-      document.querySelectorAll(".btn-action").forEach(btn=>{
-        btn.removeEventListener("click", btn._clickFn);
+  
+    if (author) {
+      const matchAuthor = itens.some(i => {
+        const autor = (i.autor || i.author || i.marca || "").toString().toLowerCase();
+        return autor.includes(author);
+      });
+      if (!matchAuthor) return false;
+    }
+
+    
+    if (publisher) {
+      const matchPub = itens.some(i => {
+        const pub = (i.editora || i.publisher || i.editor || "").toString().toLowerCase();
+        return pub.includes(publisher);
+      });
+      if (!matchPub) return false;
+    }
+
+    return true;
+  });
+
+  renderSalesTable(filtradas);
+};
+
+
+    
+    checkoutForm && checkoutForm.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      if (!cart.length) { toast("Carrinho vazio","erro"); return; }
+      const clientId = clientSelect ? clientSelect.value : null;
+      if (!clientId) { toast("Selecione o cliente","erro"); return; }
+      const pagamento = paymentSelect ? paymentSelect.value : "";
+      if (!pagamento) { toast("Selecione forma de pagamento","erro"); return; }
+      const desconto = Number(discountEl?.value) || 0;
+      const total = recalcTotal();
+
+ 
+      const itensParaSalvar = cart.map(c => ({
+        origem: c.origem,
+        id: c.id,
+        titulo: c.titulo,
+        qtd: c.qtd,
+        preco: c.preco,
+        categoria: normalizeCategory(c.categoria || c.category || ""),
+        autor: c.autor || c.marca || "",
+        editora: c.editora || c.publisher || ""
+      }));
+
+      const sale = { id: Date.now().toString(), data: new Date().toISOString(), clienteId: clientId, pagamento, desconto, total, status: "ATIVA", itens: itensParaSalvar };
+
+      try {
+        const sb = allBooks();
+        const sp = allProducts();
+        cart.forEach(it => {
+          if (it.origem === "BOOK") {
+            const idx = sb.findIndex(b => String(b.id) === String(it.id));
+            if (idx !== -1) {
+              const b = sb[idx];
+              const cur = Number(b.quantidade || b.quantity || b.stock || 0);
+              const novo = Math.max(0, cur - Number(it.qtd || 0));
+              if (b.quantidade !== undefined) b.quantidade = novo; else if (b.quantity !== undefined) b.quantity = novo; else b.quantidade = novo;
+              sb[idx] = b;
+            }
+          } else {
+            const idx = sp.findIndex(p => String(p.id) === String(it.id));
+            if (idx !== -1) {
+              const p = sp[idx];
+              const cur = Number(p.quantidade || p.quantity || p.stock || 0);
+              const novo = Math.max(0, cur - Number(it.qtd || 0));
+              if (p.quantidade !== undefined) p.quantidade = novo; else if (p.quantity !== undefined) p.quantity = novo; else p.quantidade = novo;
+              sp[idx] = p;
+            }
+          }
+        });
+        saveBooks(sb);
+        saveProducts(sp);
+      } catch (e) { console.warn("Erro ao atualizar estoque:", e); }
+
+      const sales = allSales(); sales.unshift(sale); saveSales(sales);
+      cart = []; updateCartUI(); checkoutForm.reset(); if (checkoutSection) checkoutSection.style.display = "none"; renderSalesTable(); renderReturnsTable(); populateReturnSales(); toast(`Venda finalizada — ${formatCurrency(total)}`, "sucesso");
+    });
+
+    
+    function renderSalesTable(data) {
+      if (!salesTable) return;
+      const arr = Array.isArray(data) ? data : allSales();
+      salesTable.innerHTML = "";
+      if (!arr.length) { salesTable.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#999">Nenhuma venda encontrada</td></tr>`; return; }
+      arr.forEach(s => {
+        const client = allClients().find(c => String(c.id) === String(s.clienteId));
+        const clientName = client ? (client.nome || client.name) : "—";
+        const qtdTotal = (s.itens || []).reduce((a,i)=>a + (Number(i.qtd)||0), 0);
+        const tipo = (s.pagamento || "").toString().toLowerCase();
+        let icon = "💵", label = s.pagamento || "";
+        if (tipo.includes("credito")||tipo.includes("crédito")){ icon="💳"; label="Crédito"; }
+        else if (tipo.includes("debito")||tipo.includes("débito")){ icon="💳"; label="Débito"; }
+        else if (tipo.includes("pix")){ icon="📱"; label="Pix"; }
+        else if (tipo.includes("transfer")){ icon="🏦"; label="Transferência"; }
+        else if (tipo.includes("cheque")){ icon="📄"; label="Cheque"; }
+        else if (tipo.includes("dinheiro")){ icon="💵"; label="Dinheiro"; }
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${formatDate(s.data)}<br><small>${formatTime(s.data)}</small></td>
+                        <td><strong>${(s.itens && s.itens[0] && s.itens[0].titulo) || "—"}</strong><br><small>${(s.itens && s.itens[0] && (s.itens[0].autor || s.itens[0].marca)) || ""}</small></td>
+                        <td>${clientName}</td>
+                        <td>${qtdTotal}</td>
+                        <td><span class="payment-badge">${icon} ${label}</span></td>
+                        <td><strong>${formatCurrency(s.total)}</strong></td>
+                        <td><span class="status-badge ${(s.status==="ATIVA")?"ativa":"inativa"}">${s.status}</span></td>
+                        <td><button class="btn-action" data-sale-id="${s.id}">🔁</button></td>`;
+        salesTable.appendChild(tr);
+      });
+      document.querySelectorAll(".btn-action").forEach(btn => {
+        btn.removeEventListener("click", btn._fn);
         const fn = (e) => {
           const saleId = e.currentTarget.getAttribute("data-sale-id");
           if (!saleId) return;
-          populateReturnSalesSelect();
+          populateReturnSales();
           returnModal && returnModal.classList.add("show");
-          if (saleSelect) saleSelect.value = saleId;
+          if (returnSaleSelect) returnSaleSelect.value = saleId;
         };
-        btn._clickFn = fn;
+        btn._fn = fn;
         btn.addEventListener("click", fn);
       });
     }
 
-    
-    function populateReturnSalesSelect() {
-      if (!saleSelect) return;
-      saleSelect.innerHTML = `<option value="">Selecione a venda que será devolvida</option>`;
-      const arr = allSales();
-      if (!arr || arr.length === 0) { saleSelect.innerHTML += `<option disabled>Nenhuma venda registrada</option>`; return; }
-      arr.forEach(s => {
-        const cliente = (allClients() || clients).find(c => String(c.id) === String(s.clienteId));
-        const nomeCliente = cliente ? (cliente.nome || cliente.name) : "—";
-        const total = formatCurrency(s.total);
-        const dataVenda = formatDate(s.data);
-        const itensTxt = (s.itens||[]).map(i=>`${i.titulo} (${i.qtd}x)`).join(", ");
-        const opt = document.createElement("option");
-        opt.value = s.id;
-        opt.textContent = `${dataVenda} - ${nomeCliente} - ${total} → ${itensTxt}`;
-        saleSelect.appendChild(opt);
+    function renderReturnsTable() {
+      if (!returnsTable) return;
+      const arr = allReturns();
+      returnsTable.innerHTML = "";
+      if (!arr.length) { returnsTable.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#999">Nenhuma devolução registrada</td></tr>`; return; }
+      arr.forEach(r => {
+        const client = allClients().find(c => String(c.id) === String(r.clienteId));
+        const clientName = client ? (client.nome || client.name) : "—";
+        const sale = allSales().find(s => String(s.id) === String(r.saleId));
+        const saleDate = sale ? formatDate(sale.data) : "—";
+        const itemTitle = r.itens && r.itens[0] ? r.itens[0].titulo : "—";
+        const qtd = r.itens && r.itens[0] ? r.itens[0].qtd : 0;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${formatDate(r.data)}</td><td>${saleDate}</td><td>${clientName}</td><td>${itemTitle}</td><td>${qtd}</td><td><span class="payment-badge">💬 ${r.notes || r.type || "Outro"}</span></td><td><strong style="color:#b22222">${formatCurrency(r.total || 0)}</strong></td><td><span class="status-badge ativa">${r.status || "Processada"}</span></td>`;
+        returnsTable.appendChild(tr);
       });
     }
 
-
-    processReturnBtn && processReturnBtn.addEventListener("click", () => { populateReturnSalesSelect(); returnModal && returnModal.classList.add("show"); });
-    closeReturnModal && closeReturnModal.addEventListener("click", ()=> returnModal && returnModal.classList.remove("show"));
-    cancelReturnBtn && cancelReturnBtn.addEventListener("click", ()=> returnModal && returnModal.classList.remove("show"));
-
     
-    returnType && returnType.addEventListener("change", (e)=> {
-      const v = e.target.value;
-      const group = document.getElementById("exchangeBookGroup");
-      if (group) group.style.display = (v === "TROCA") ? "block" : "none";
-      if (v === "TROCA") populateExchangeBookSelect();
-    });
+    function populateReturnSales() {
+      if (!returnSaleSelect) return;
+      returnSaleSelect.innerHTML = `<option value="">Selecione a venda</option>`;
+      const arr = allSales();
+      if (!arr.length) { returnSaleSelect.innerHTML += `<option disabled>Nenhuma venda registrada</option>`; return; }
+      arr.forEach(s => {
+        const client = allClients().find(c => String(c.id) === String(s.clienteId));
+        const clientName = client ? (client.nome || client.name) : "—";
+        const itemsTxt = (s.itens || []).map(i => `${i.titulo} (${i.qtd}x)`).join(", ");
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = `${formatDate(s.data)} - ${clientName} - ${formatCurrency(s.total)} → ${itemsTxt}`;
+        returnSaleSelect.appendChild(opt);
+      });
+    }
 
-    // processar devolução
-    returnForm && returnForm.addEventListener("submit", (ev)=> {
+    returnForm && returnForm.addEventListener("submit", (ev) => {
       ev.preventDefault();
-      if (!saleSelect) return alert("Seletor de venda ausente.");
-      const saleId = saleSelect.value;
+      if (!returnSaleSelect) return alert("Selecione a venda.");
+      const saleId = returnSaleSelect.value;
       if (!saleId) return alert("Selecione a venda.");
-      const sale = (allSales()||[]).find(s => String(s.id) === String(saleId)) || sales.find(s=>String(s.id)===String(saleId));
+      const sale = allSales().find(s => String(s.id) === String(saleId));
       if (!sale) return alert("Venda não encontrada.");
       const notes = returnNotes ? returnNotes.value.trim() : "";
       const quant = returnQuantity ? Number(returnQuantity.value) || 1 : 1;
-      const rtype = returnType ? (returnType.value || "DEVOLUCAO") : "DEVOLUCAO";
-      const reason = returnReason ? (returnReason.value || "") : "";
 
-     
-      sale.itens.forEach(it => {
-        const book = (allBooks()||[]).find(b => String(b.id) === String(it.id));
-        if (book) {
-          book.quantidade = (Number(book.quantidade) || 0) + (it.qtd || quant);
-          
-        }
-      });
-      books = allBooks();
-      saveBooks();
+      try {
+        const sb = allBooks();
+        const sp = allProducts();
+        sale.itens.forEach(it => {
+          if (it.origem === "BOOK") {
+            const idx = sb.findIndex(b => String(b.id) === String(it.id));
+            if (idx !== -1) {
+              const b = sb[idx];
+              const cur = Number(b.quantidade || b.quantity || b.stock || 0);
+              const novo = cur + Number(it.qtd || quant);
+              if (b.quantidade !== undefined) b.quantidade = novo; else if (b.quantity !== undefined) b.quantity = novo; else b.quantidade = novo;
+              sb[idx] = b;
+            }
+          } else {
+            const idx = sp.findIndex(p => String(p.id) === String(it.id));
+            if (idx !== -1) {
+              const p = sp[idx];
+              const cur = Number(p.quantidade || p.quantity || p.stock || 0);
+              const novo = cur + Number(it.qtd || quant);
+              if (p.quantidade !== undefined) p.quantidade = novo; else if (p.quantity !== undefined) p.quantity = novo; else p.quantidade = novo;
+              sp[idx] = p;
+            }
+          }
+        });
+        saveBooks(sb); saveProducts(sp);
+      } catch (e) { console.warn("Erro ao repor estoque:", e); }
 
-      
-      const saleObj = sales.find(s => String(s.id) === String(saleId));
-      if (saleObj) {
-        saleObj.status = "Devolvida";
-        saveSales();
-      } else {
-        
-        const arr = allSales();
-        const idx = arr.findIndex(s => String(s.id) === String(saleId));
-        if (idx >= 0) { arr[idx].status = "Devolvida"; localStorage.setItem("livraria_sales", JSON.stringify(arr)); sales = arr; }
-      }
-
-      
-      const devolucao = {
-        id: Date.now(),
-        saleId: sale.id,
-        clienteId: sale.clienteId,
-        itens: sale.itens,
-        total: sale.total,
-        notes: notes || reason || "Outro",
-        data: new Date().toISOString(),
-        status: "Processada",
-        type: rtype
-      };
-      returns.unshift(devolucao);
-      saveReturns();
-      renderReturnsTable();
-      renderSalesTable();
-      showToast("Devolução/Troca registrada com sucesso!");
+      const sales = allSales();
+      const idx = sales.findIndex(s => String(s.id) === String(saleId));
+      if (idx !== -1) { sales[idx].status = "DEVOLVIDA"; saveSales(sales); }
+      const returns = allReturns();
+      const rec = { id: Date.now().toString(), saleId: sale.id, clienteId: sale.clienteId, itens: sale.itens, total: sale.total, notes, data: new Date().toISOString(), status: "Processada", type: "DEVOLUCAO" };
+      returns.unshift(rec); saveReturns(returns);
+      renderReturnsTable(); renderSalesTable(); toast("Devolução registrada", "sucesso");
       returnModal && returnModal.classList.remove("show");
       returnForm && returnForm.reset();
     });
 
-   
-    function renderReturnsTable() {
-      if (!returnsTableBody) return;
-      returnsTableBody.innerHTML = "";
-      if (!returns || returns.length === 0) {
-        returnsTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#999;">Nenhuma devolução registrada</td></tr>`;
-        return;
-      }
-      returns.forEach(r => {
-        const cliente = (allClients()||clients).find(c => String(c.id) === String(r.clienteId));
-        const nomeCliente = cliente ? (cliente.nome || cliente.name) : "—";
-        const venda = (allSales()||sales).find(v=>String(v.id)===String(r.saleId));
-        const dataVenda = venda ? formatDate(venda.data) : "—";
-        const livro = r.itens && r.itens[0] ? r.itens[0].titulo : "—";
-        const qtd = r.itens && r.itens[0] ? r.itens[0].qtd : 0;
-        const valor = formatCurrency(r.total || 0);
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${formatDate(r.data)}</td>
-          <td>${dataVenda}</td>
-          <td>${nomeCliente}</td>
-          <td>${livro}</td>
-          <td>${qtd}</td>
-          <td><span class="payment-badge">💬 ${r.notes || "Outro"}</span></td>
-          <td><strong style="color:#b22222">${valor}</strong></td>
-          <td><span class="status-badge ativa">${r.status}</span></td>
-        `;
-        returnsTableBody.appendChild(tr);
-      });
-    }
-
-    function applySalesFilter() {
-      const dateFromRaw = document.getElementById("filterSalesDateFrom")?.value || "";
-      const dateToRaw = document.getElementById("filterSalesDateTo")?.value || "";
-      const category = (document.getElementById("filterSalesCategory")?.value || "").trim().toLowerCase();
-      const author = (document.getElementById("filterSalesAuthor")?.value || "").trim().toLowerCase();
-      const publisher = (document.getElementById("filterSalesPublisher")?.value || "").trim().toLowerCase();
-      const client = (document.getElementById("filterSalesClient")?.value || "").trim();
-
-      const all = allSales();
-      if (!dateFromRaw && !dateToRaw && !category && !author && !publisher && !client) {
-        renderSalesTable(all);
-        return;
-      }
-
-      const normalize = s => (s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-      const from = dateFromRaw ? new Date(dateFromRaw + "T00:00:00") : null;
-      const to = dateToRaw ? new Date(dateToRaw + "T23:59:59") : null;
-
-      const filtered = (all || []).filter(sale => {
-        const sd = new Date(sale.data);
-        if (from && sd < from) return false;
-        if (to && sd > to) return false;
-        if (client && String(sale.clienteId) !== String(client)) return false;
-        if (!category && !author && !publisher) return true;
-        // verifica livros da venda
-        return (sale.itens || []).some(item => {
-          const book = (allBooks()||[]).find(b => String(b.id) === String(item.id));
-          if (!book) return false;
-          const cat = normalize(book.categoria || book.category || "");
-          const aut = normalize(book.autor || book.author || "");
-          const pub = normalize(book.editora || book.publisher || "");
-          const catOk = !category || cat.includes(category);
-          const autOk = !author || aut.includes(author);
-          const pubOk = !publisher || pub.includes(publisher);
-          return catOk && autOk && pubOk;
-        });
-      });
-      renderSalesTable(filtered);
-    }
-
   
-    filterIds.forEach(id => {
+    function populateClients() {
+      if (!clientSelect) return;
+      clientSelect.innerHTML = `<option value="">Selecione o cliente</option>`;
+      allClients().forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = String(c.id);
+        opt.textContent = c.nome || c.name || "Cliente";
+        clientSelect.appendChild(opt);
+      });
+
+   
+      const filterClient = document.getElementById("filterSalesClient");
+      if (filterClient) {
+        filterClient.innerHTML = `<option value="">Todos os clientes</option>`;
+        allClients().forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = String(c.id);
+          opt.textContent = c.nome || c.name || "Cliente";
+          filterClient.appendChild(opt);
+        });
+      }
+    }
+
+    
+    const filterIdsLocal = ["filterSalesDateFrom","filterSalesDateTo","filterSalesCategory","filterSalesAuthor","filterSalesPublisher","filterSalesClient"];
+    filterIdsLocal.forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       const ev = (el.type === "date" || el.tagName === "SELECT") ? "change" : "input";
-      el.addEventListener(ev, applySalesFilter);
+      el.addEventListener(ev, () => {
+        if (typeof window.applySalesFilter === "function") window.applySalesFilter();
+        else renderSalesTable();
+      });
     });
 
     
     try {
-      populateBookSelect();
-      populateClientSelect();
-      populateFilterClients();
-      populateExchangeBookSelect();
+      populateSelect();
+      populateClients();
+      populateReturnSales();
       renderSalesTable();
       renderReturnsTable();
-    } catch(e) {
-      console.error("Erro init:", e);
-    }
+    } catch (e) { console.error("Erro ao inicializar vendas.js:", e); }
 
-    
-    window.__livraria = {
-      refresh: function() {
-        books = JSON.parse(localStorage.getItem("livraria_books")) || [];
-        clients = JSON.parse(localStorage.getItem("livraria_clients")) || [];
-        sales = JSON.parse(localStorage.getItem("livraria_sales")) || [];
-        returns = JSON.parse(localStorage.getItem("livraria_returns")) || [];
-        populateBookSelect(); populateClientSelect(); populateFilterClients(); renderSalesTable(); renderReturnsTable();
-      },
-      data: () => ({ books, clients, sales, returns })
+  
+    window.__vendas = {
+      refresh: () => { populateSelect(); populateClients(); populateReturnSales(); renderSalesTable(); renderReturnsTable(); },
+      data: () => ({ books: allBooks(), products: allProducts(), clients: allClients(), sales: allSales(), returns: allReturns(), cart })
     };
 
   } catch (err) {
-    console.error("Erro venda.js:", err);
+    console.error("Erro vendas.js:", err);
   }
 });
+  
