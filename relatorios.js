@@ -179,3 +179,123 @@ document.addEventListener("DOMContentLoaded", () => {
   tableContainer.style.display = "block";
   reportSummary.style.display = "block";
 });
+
+
+const UIManager = {
+  handleLogout() {
+    let modal = document.getElementById("logoutModal");
+
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "logoutModal";
+      modal.innerHTML = `
+        <div class="logout-overlay">
+          <div class="logout-box">
+            <h2 class="logout-title">Sair do Sistema</h2>
+            <p class="logout-message">Tem certeza que deseja sair?</p>
+            <div class="logout-actions">
+              <button id="cancelLogout" class="logout-btn cancel">Cancelar</button>
+              <button id="confirmLogout" class="logout-btn confirm">Confirmar</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      const style = document.createElement("style");
+      style.textContent = `
+        .logout-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 99999;
+          animation: fadeIn 0.25s ease;
+        }
+
+        .logout-box {
+          background: #fff;
+          padding: 30px 40px;
+          border-radius: 12px;
+          text-align: center;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+          width: 360px;
+          animation: popUp 0.25s ease;
+        }
+
+        .logout-title {
+          font-size: 20px;
+          font-weight: 700;
+          color: #4b0d0d;
+          margin-bottom: 10px;
+        }
+
+        .logout-message {
+          font-size: 15px;
+          color: #333;
+          margin-bottom: 24px;
+        }
+
+        .logout-actions {
+          display: flex;
+          justify-content: center;
+          gap: 14px;
+        }
+
+        .logout-btn {
+          background-color: #4b0d0d;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          padding: 10px 22px;
+          font-size: 15px;
+          transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        .logout-btn:hover {
+          background-color: #2d0707;
+          transform: scale(1.03);
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes popUp {
+          from { transform: scale(0.9); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    modal.querySelector(".logout-overlay").style.display = "flex";
+
+    const cancelBtn = modal.querySelector("#cancelLogout");
+    const confirmBtn = modal.querySelector("#confirmLogout");
+    const overlay = modal.querySelector(".logout-overlay");
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.style.display = "none";
+    });
+
+    cancelBtn.onclick = () => {
+      overlay.style.display = "none";
+    };
+
+    confirmBtn.onclick = () => {
+      overlay.style.display = "none";
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 300);
+    };
+  },
+};

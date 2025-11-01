@@ -11,49 +11,8 @@
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
-    <style>
-      
-.info-box {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.info-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  padding: 20px 28px;
-  border: 1px solid #e6e6e6;
-}
-
-.info-card h4 {
-  color: #3d0c02;
-  margin-bottom: 14px;
-  font-weight: 600;
-}
-
-.info-card .row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid #f0f0f0;
-  padding: 10px 0;
-}
-
-.info-card .row:first-of-type {
-  border-top: none;
-}
-
-.info-card strong {
-  color: #3d0c02;
-  font-weight: 600;
-}
-
-    </style>
+    /> 
+    <link rel="stylesheet" href="relatorios.css" />
   </head>
   <body>
     <div id="dashboard" class="dashboard">
@@ -817,94 +776,7 @@
 
     
     <div id="toastContainer"></div>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Sidebar toggle
-        var sidebarToggle = document.getElementById("sidebarToggle");
-        var sidebar = document.getElementById("sidebar");
-        var mainContent = document.querySelector(".main-content");
-        if (sidebarToggle && sidebar && mainContent) {
-          sidebarToggle.addEventListener("click", function () {
-            sidebar.classList.toggle("collapsed");
-            mainContent.classList.toggle("sidebar-collapsed");
-            var icon = sidebarToggle.querySelector("i");
-            if (icon) {
-              icon.classList.toggle("fa-chevron-left");
-              icon.classList.toggle("fa-chevron-right");
-            }
-          });
-        }
-        // Mobile menu
-        var mobileBtn = document.getElementById("mobileMenuBtn");
-        if (mobileBtn && sidebar) {
-          mobileBtn.addEventListener("click", function () {
-            sidebar.classList.toggle("mobile-open");
-          });
-        }
-        // Modal openers by id mapping
-        var modalMap = {
-          addBookBtn: "bookModal",
-          addClientBtn: "clientModal",
-          addProductBtn: "productModal",
-          addUserBtn: "userModal",
-          editBookstoreBtn: "bookstoreModal",
-          processReturnBtn: "returnModal",
-        };
-        Object.keys(modalMap).forEach(function (k) {
-          var btn = document.getElementById(k);
-          if (btn) {
-            btn.addEventListener("click", function (e) {
-              e.preventDefault();
-              var m = document.getElementById(modalMap[k]);
-              if (m) m.classList.add("show");
-            });
-          }
-        });
-        // Close buttons and cancel buttons
-        document
-          .querySelectorAll('.close-btn, [id^="cancel"]')
-          .forEach(function (btn) {
-            btn.addEventListener("click", function () {
-              var modal = btn.closest(".modal");
-              if (modal) modal.classList.remove("show");
-            });
-          });
-        // Backdrop click to close
-        document.querySelectorAll(".modal").forEach(function (mod) {
-          mod.addEventListener("click", function (e) {
-            if (e.target === mod) mod.classList.remove("show");
-          });
-        });
-        // Escape key
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape")
-            document.querySelectorAll(".modal.show").forEach(function (m) {
-              m.classList.remove("show");
-            });
-        });
-        // Simple form submit handler -> close modal and show toast
-        function showToast(msg, type, dur) {
-          var t = document.createElement("div");
-          t.className = "toast show " + (type || "success");
-          t.textContent = msg;
-          document.body.appendChild(t);
-          setTimeout(function () {
-            t.classList.remove("show");
-            setTimeout(function () {
-              t.remove();
-            }, 300);
-          }, dur || 3000);
-        }
-        document.querySelectorAll("form").forEach(function (form) {
-          form.addEventListener("submit", function (e) {
-            e.preventDefault();
-            var m = form.closest(".modal");
-            if (m) m.classList.remove("show");
-            showToast("Operação realizada com sucesso");
-          });
-        });
-      });
-    </script>
+    
     <script src="relatorios.js"></script>
   </body>
 </html>
