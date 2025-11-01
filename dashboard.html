@@ -12,8 +12,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="stylesheet" href="CSS/dashboard.css" />
   </head>
   <body>
     <div id="dashboard" class="dashboard">
@@ -64,40 +63,17 @@
             <span>Sair</span>
           </a>
         </div>
-        <div
-          style="
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-          "
-        >
-          <button
-            class="btn-icon"
-            id="sidebarToggle"
-            style="
-              background: var(--primary-color);
-              color: white;
-              border: none;
-              width: 40px;
-              height: 40px;
-              border-radius: 50%;
-              cursor: pointer;
-              transition: var(--transition);
-              position: relative;
-              top: 90px;
-            "
-          >
+        <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">
+          <button class="btn-icon" id="sidebarToggle" style="background: var(--primary-color); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: var(--transition); position: relative; top: 90px;">
             <i class="fas fa-chevron-left"></i>
           </button>
         </div>
       </nav>
+
       <main class="main-content">
         <header class="topbar">
           <div class="topbar-left">
-            <button class="mobile-menu-btn" id="mobileMenuBtn">
-              <i class="fas fa-bars"></i>
-            </button>
+            <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
             <h1 id="pageTitle">Painel Administrativo</h1>
           </div>
           <div class="topbar-right">
@@ -110,235 +86,105 @@
             </div>
           </div>
         </header>
+
         <div class="content-area">
           <section id="dashboardSection">
             <div class="stats-grid">
               <div class="stat-card">
-                <div class="stat-icon sales">
-                  <i class="fas fa-calendar-day"></i>
-                </div>
+                <div class="stat-icon sales"><i class="fas fa-calendar-day"></i></div>
                 <div class="stat-info">
                   <h3 id="dailySales">R$ 0,00</h3>
                   <p>Vendas do Dia</p>
-                  <div class="stat-change positive" id="dailySalesChange">
-                    <i class="fas fa-arrow-up"></i>
-                    Hoje
-                  </div>
+                  <div class="stat-change positive" id="dailySalesChange"><i class="fas fa-arrow-up"></i> Hoje</div>
                 </div>
               </div>
+
               <div class="stat-card sales">
-                <div class="stat-icon sales">
-                  <i class="fas fa-chart-line"></i>
-                </div>
+                <div class="stat-icon sales"><i class="fas fa-chart-line"></i></div>
                 <div class="stat-info">
                   <h3 id="monthlySales">R$ 0,00</h3>
                   <p>Vendas do Mês</p>
-                  <div class="stat-change positive" id="monthlySalesChange">
-                    <i class="fas fa-calendar-alt"></i>
-                    Este mês
-                  </div>
+                  <div class="stat-change positive" id="monthlySalesChange"><i class="fas fa-calendar-alt"></i> Este mês</div>
                 </div>
               </div>
+
               <div class="stat-card">
-                <div class="stat-icon books">
-                  <i class="fas fa-star"></i>
-                </div>
+                <div class="stat-icon books"><i class="fas fa-star"></i></div>
                 <div class="stat-info">
                   <h3 id="newBooks">0</h3>
                   <p>Livros Novos</p>
-                  <div class="stat-change" id="newBooksChange">
-                    <i class="fas fa-box"></i>
-                    <span id="newBooksStock">0</span> em estoque
-                  </div>
                 </div>
               </div>
+
               <div class="stat-card">
-                <div class="stat-icon books">
-                  <i class="fas fa-recycle"></i>
-                </div>
+                <div class="stat-icon books"><i class="fas fa-recycle"></i></div>
                 <div class="stat-info">
                   <h3 id="usedBooks">0</h3>
                   <p>Livros Usados</p>
-                  <div class="stat-change" id="usedBooksChange">
-                    <i class="fas fa-box-open"></i>
-                    <span id="usedBooksStock">0</span> em estoque
-                  </div>
                 </div>
               </div>
+
               <div class="stat-card clients">
-                <div class="stat-icon clients">
-                  <i class="fas fa-users"></i>
-                </div>
+                <div class="stat-icon clients"><i class="fas fa-users"></i></div>
                 <div class="stat-info">
                   <h3 id="totalClients">0</h3>
                   <p>Clientes Ativos</p>
-                  <div class="stat-change" id="clientsChange">
-                    <i class="fas fa-handshake"></i>
-                    <span id="totalLoans">0</span> empréstimos ativos
-                  </div>
                 </div>
               </div>
+
               <div class="stat-card loans">
-                <div class="stat-icon loans">
-                  <i class="fas fa-book-reader"></i>
-                </div>
+                <div class="stat-icon loans"><i class="fas fa-book-reader"></i></div>
                 <div class="stat-info">
                   <h3 id="totalBooksLoaned">0</h3>
                   <p>Livros Emprestados</p>
-                  <div class="stat-change" id="booksLoanedChange">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span id="overdueLoans">0</span> em atraso
-                  </div>
                 </div>
               </div>
             </div>
-            <div
-              style="
-                display: grid;
-                grid-template-columns: 2fr 1fr;
-                gap: 24px;
-                margin-bottom: 24px;
-              "
-            >
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
               <div class="card">
                 <div class="card-header">
                   <div>
                     <h2 class="card-title">Livros Mais Vendidos</h2>
-                    <p class="card-subtitle">
-                      Top 5 livros com maior volume de vendas
-                    </p>
+                    <p class="card-subtitle">Top 5 livros com maior volume de vendas</p>
                   </div>
                 </div>
                 <div id="topSellingBooks">
-                  <div class="empty-state">
-                    <i class="fas fa-chart-bar"></i>
-                    <h3>Nenhuma venda registrada</h3>
-                    <p>Os livros mais vendidos aparecerão aqui</p>
-                  </div>
+                  <div class="empty-state"><i class="fas fa-chart-bar"></i><h3>Nenhuma venda registrada</h3><p>Os livros mais vendidos aparecerão aqui</p></div>
                 </div>
               </div>
+
               <div class="card">
                 <div class="card-header">
                   <div>
                     <h2 class="card-title">Estoque Baixo</h2>
-                    <p class="card-subtitle">
-                      Livros que precisam de reposição
-                    </p>
+                    <p class="card-subtitle">Livros que precisam de reposição</p>
                   </div>
                 </div>
                 <div id="lowStockBooks">
-                  <div class="empty-state">
-                    <i class="fas fa-boxes"></i>
-                    <h3>Estoque OK</h3>
-                    <p>Nenhum livro com estoque baixo</p>
-                  </div>
+                  <div class="empty-state"><i class="fas fa-boxes"></i><h3>Estoque OK</h3><p>Nenhum livro com estoque baixo</p></div>
                 </div>
               </div>
             </div>
+
             <div class="card">
               <div class="card-header">
                 <div>
                   <h2 class="card-title">Atividades Recentes</h2>
-                  <p class="card-subtitle">
-                    Últimas operações realizadas no sistema
-                  </p>
+                  <p class="card-subtitle">Últimas operações realizadas no sistema</p>
                 </div>
               </div>
               <div id="recentActivities">
-                <div class="empty-state">
-                  <i class="fas fa-clock"></i>
-                  <h3>Nenhuma atividade recente</h3>
-                  <p>
-                    As atividades aparecerão aqui conforme você usar o sistema
-                  </p>
-                </div>
+                <div class="empty-state"><i class="fas fa-clock"></i><h3>Nenhuma atividade recente</h3><p>As atividades aparecerão aqui conforme você usar o sistema</p></div>
               </div>
             </div>
           </section>
         </div>
       </main>
     </div>
+
     <div id="toastContainer"></div>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        var sidebarToggle = document.getElementById("sidebarToggle");
-        var sidebar = document.getElementById("sidebar");
-        var mainContent = document.querySelector(".main-content");
-        if (sidebarToggle && sidebar && mainContent) {
-          sidebarToggle.addEventListener("click", function () {
-            sidebar.classList.toggle("collapsed");
-            mainContent.classList.toggle("sidebar-collapsed");
-            var icon = sidebarToggle.querySelector("i");
-            if (icon) {
-              icon.classList.toggle("fa-chevron-left");
-              icon.classList.toggle("fa-chevron-right");
-            }
-          });
-        }
-        var mobileBtn = document.getElementById("mobileMenuBtn");
-        if (mobileBtn && sidebar) {
-          mobileBtn.addEventListener("click", function () {
-            sidebar.classList.toggle("mobile-open");
-          });
-        }
-        var modalMap = {
-          addBookBtn: "bookModal",
-          addClientBtn: "clientModal",
-          addProductBtn: "productModal",
-          addUserBtn: "userModal",
-          editBookstoreBtn: "bookstoreModal",
-          processReturnBtn: "returnModal",
-        };
-        Object.keys(modalMap).forEach(function (k) {
-          var btn = document.getElementById(k);
-          if (btn) {
-            btn.addEventListener("click", function (e) {
-              e.preventDefault();
-              var m = document.getElementById(modalMap[k]);
-              if (m) m.classList.add("show");
-            });
-          }
-        });
-        document
-          .querySelectorAll('.close-btn, [id^="cancel"]')
-          .forEach(function (btn) {
-            btn.addEventListener("click", function () {
-              var modal = btn.closest(".modal");
-              if (modal) modal.classList.remove("show");
-            });
-          });
-        document.querySelectorAll(".modal").forEach(function (mod) {
-          mod.addEventListener("click", function (e) {
-            if (e.target === mod) mod.classList.remove("show");
-          });
-        });
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape")
-            document.querySelectorAll(".modal.show").forEach(function (m) {
-              m.classList.remove("show");
-            });
-        });
-        function showToast(msg, type, dur) {
-          var t = document.createElement("div");
-          t.className = "toast show " + (type || "success");
-          t.textContent = msg;
-          document.body.appendChild(t);
-          setTimeout(function () {
-            t.classList.remove("show");
-            setTimeout(function () {
-              t.remove();
-            }, 300);
-          }, dur || 3000);
-        }
-        document.querySelectorAll("form").forEach(function (form) {
-          form.addEventListener("submit", function (e) {
-            e.preventDefault();
-            var m = form.closest(".modal");
-            if (m) m.classList.remove("show");
-            showToast("Operação realizada com sucesso");
-          });
-        });
-      });
-    </script>
+
+    <script src="Javascript/dashboard.js"></script>
   </body>
 </html>
