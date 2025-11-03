@@ -53,27 +53,71 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 
+  const clientType = document.getElementById("clientType");
+  const clientDocument = document.getElementById("clientDocument");
+  const documentLabel = document.getElementById("documentLabel");
+  const clientPhone = document.getElementById("clientPhone");
+
+  
+  const aplicarMascaraCPF = (v) => {
+    v = v.replace(/\D/g, "");
+    if (v.length > 11) v = v.slice(0, 11);
+    return v
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  };
+
+  const aplicarMascaraCNPJ = (v) => {
+    v = v.replace(/\D/g, "");
+    if (v.length > 14) v = v.slice(0, 14);
+    return v
+      .replace(/^(\d{2})(\d)/, "$1.$2")
+      .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/\.(\d{3})(\d)/, ".$1/$2")
+      .replace(/(\d{4})(\d)/, "$1-$2");
+  };
+
   const aplicarMascaraTelefone = (v) => {
     v = v.replace(/\D/g, "");
-    if (v.length <= 10) return v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+    if (v.length > 11) v = v.slice(0, 11); 
+    if (v.length <= 10) {
+      return v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+    }
     return v.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
   };
 
-  const aplicarMascaraDocumento = (v) => {
-    v = v.replace(/\D/g, "");
-    if (v.length <= 11) {
-      return v
-        .replace(/(\d{3})(\d)/, "$1.$2")
-        .replace(/(\d{3})(\d)/, "$1.$2")
-        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  
+  clientType.addEventListener("change", () => {
+    clientDocument.value = ""; 
+
+    if (clientType.value === "PESSOA_FISICA") {
+      documentLabel.textContent = "CPF *";
+      clientDocument.placeholder = "000.000.000-00";
+      clientDocument.maxLength = 14;
+      clientDocument.oninput = (e) => {
+        e.target.value = aplicarMascaraCPF(e.target.value);
+      };
+    } else if (clientType.value === "PESSOA_JURIDICA") {
+      documentLabel.textContent = "CNPJ *";
+      clientDocument.placeholder = "00.000.000/0000-00";
+      clientDocument.maxLength = 18;
+      clientDocument.oninput = (e) => {
+        e.target.value = aplicarMascaraCNPJ(e.target.value);
+      };
     } else {
-      return v
-        .replace(/^(\d{2})(\d)/, "$1.$2")
-        .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
-        .replace(/\.(\d{3})(\d)/, ".$1/$2")
-        .replace(/(\d{4})(\d)/, "$1-$2");
+      documentLabel.textContent = "CPF/CNPJ *";
+      clientDocument.placeholder = "Digite o CPF ou CNPJ";
+      clientDocument.removeAttribute("maxlength");
+      clientDocument.oninput = null;
     }
-  };
+  });
+
+
+  clientPhone.addEventListener("input", (e) => {
+    e.target.value = aplicarMascaraTelefone(e.target.value);
+  });
+
 
   function renderizarClientes(lista = clientes) {
     clientsTableBody.innerHTML = "";
@@ -366,3 +410,14 @@ const UIManager = {
     };
   },
 };
+
+
+
+const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('sidebarToggle');
+  const icon = toggleBtn.querySelector('i');
+
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    toggleBtn.classList.toggle('rotate');
+  });

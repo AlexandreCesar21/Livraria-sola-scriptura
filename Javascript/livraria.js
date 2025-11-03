@@ -27,6 +27,44 @@ document.addEventListener("DOMContentLoaded", () => {
     cep: document.getElementById("bookstoreFormCEP"),
   };
 
+ 
+  const aplicarMascaraCNPJ = (v) => {
+    v = v.replace(/\D/g, "");
+    if (v.length > 14) v = v.slice(0, 14);
+    return v
+      .replace(/^(\d{2})(\d)/, "$1.$2")
+      .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/\.(\d{3})(\d)/, ".$1/$2")
+      .replace(/(\d{4})(\d)/, "$1-$2");
+  };
+
+  const aplicarMascaraTelefone = (v) => {
+    v = v.replace(/\D/g, "");
+    if (v.length > 11) v = v.slice(0, 11);
+    if (v.length <= 10) {
+      return v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+    }
+    return v.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+  };
+
+  const aplicarMascaraCEP = (v) => {
+    v = v.replace(/\D/g, "");
+    if (v.length > 8) v = v.slice(0, 8);
+    return v.replace(/(\d{5})(\d{0,3})/, "$1-$2");
+  };
+
+ 
+  formFields.cnpj.addEventListener("input", (e) => {
+    e.target.value = aplicarMascaraCNPJ(e.target.value);
+  });
+  formFields.phone.addEventListener("input", (e) => {
+    e.target.value = aplicarMascaraTelefone(e.target.value);
+  });
+  formFields.cep.addEventListener("input", (e) => {
+    e.target.value = aplicarMascaraCEP(e.target.value);
+  });
+
+
   function loadBookstore() {
     const saved = JSON.parse(localStorage.getItem("bookstoreData"));
     if (saved) {
@@ -36,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+ 
   editBtn.addEventListener("click", () => {
     const saved = JSON.parse(localStorage.getItem("bookstoreData"));
     if (saved) {
@@ -50,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.add("show");
   });
 
+  
   const closeModal = () => modal.classList.remove("show");
   closeModalBtn.addEventListener("click", closeModal);
   cancelBtn.addEventListener("click", closeModal);
@@ -57,6 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === modal) closeModal();
   });
 
+  
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -65,8 +106,21 @@ document.addEventListener("DOMContentLoaded", () => {
       data[key] = formFields[key].value.trim();
     });
 
-    localStorage.setItem("bookstoreData", JSON.stringify(data));
+    
+    if (data.cnpj.replace(/\D/g, "").length !== 14) {
+      showToast("CNPJ inválido!", "error");
+      return;
+    }
+    if (data.phone.replace(/\D/g, "").length < 10) {
+      showToast("Telefone inválido!", "error");
+      return;
+    }
+    if (data.cep.replace(/\D/g, "").length !== 8) {
+      showToast("CEP inválido!", "error");
+      return;
+    }
 
+    localStorage.setItem("bookstoreData", JSON.stringify(data));
     Object.keys(fields).forEach((key) => {
       fields[key].textContent = data[key];
     });
@@ -74,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.remove("show");
     showToast("Informações da livraria atualizadas com sucesso!");
   });
+
 
   function showToast(message, type = "success") {
     const toast = document.createElement("div");
@@ -90,122 +145,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('sidebarToggle');
+  const icon = toggleBtn.querySelector('i');
 
-const UIManager = {
-  handleLogout() {
-    let modal = document.getElementById("logoutModal");
-
-    if (!modal) {
-      modal = document.createElement("div");
-      modal.id = "logoutModal";
-      modal.innerHTML = `
-        <div class="logout-overlay">
-          <div class="logout-box">
-            <h2 class="logout-title">Sair do Sistema</h2>
-            <p class="logout-message">Tem certeza que deseja sair?</p>
-            <div class="logout-actions">
-              <button id="cancelLogout" class="logout-btn cancel">Cancelar</button>
-              <button id="confirmLogout" class="logout-btn confirm">Confirmar</button>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-
-      const style = document.createElement("style");
-      style.textContent = `
-        .logout-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0,0,0,0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 99999;
-          animation: fadeIn 0.25s ease;
-        }
-
-        .logout-box {
-          background: #fff;
-          padding: 30px 40px;
-          border-radius: 12px;
-          text-align: center;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-          width: 360px;
-          animation: popUp 0.25s ease;
-        }
-
-        .logout-title {
-          font-size: 20px;
-          font-weight: 700;
-          color: #4b0d0d;
-          margin-bottom: 10px;
-        }
-
-        .logout-message {
-          font-size: 15px;
-          color: #333;
-          margin-bottom: 24px;
-        }
-
-        .logout-actions {
-          display: flex;
-          justify-content: center;
-          gap: 14px;
-        }
-
-        .logout-btn {
-          background-color: #4b0d0d;
-          color: #fff;
-          border: none;
-          border-radius: 8px;
-          font-weight: 600;
-          cursor: pointer;
-          padding: 10px 22px;
-          font-size: 15px;
-          transition: background 0.2s ease, transform 0.1s ease;
-        }
-
-        .logout-btn:hover {
-          background-color: #2d0707;
-          transform: scale(1.03);
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        @keyframes popUp {
-          from { transform: scale(0.9); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-
-    modal.querySelector(".logout-overlay").style.display = "flex";
-
-    const cancelBtn = modal.querySelector("#cancelLogout");
-    const confirmBtn = modal.querySelector("#confirmLogout");
-    const overlay = modal.querySelector(".logout-overlay");
-
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) overlay.style.display = "none";
-    });
-
-    cancelBtn.onclick = () => {
-      overlay.style.display = "none";
-    };
-
-    confirmBtn.onclick = () => {
-      overlay.style.display = "none";
-      setTimeout(() => {
-        window.location.href = "login.html";
-      }, 300);
-    };
-  },
-};
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    toggleBtn.classList.toggle('rotate');
+  });
