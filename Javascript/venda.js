@@ -172,60 +172,112 @@ document.addEventListener("DOMContentLoaded", () => {
 
     
     function populateSelect() {
-      if (!selectEl) return;
-      selectEl.innerHTML = `<option value="">Selecione um item disponível</option>`;
-      const books = allBooks().map(b => ({
-        origem: "BOOK",
-        id: String(b.id),
-        nome: b.titulo || b.title || b.name || "Sem título",
-        autor: b.autor || b.author || "",
-        preco: Number(b.preco || b.value || b.valor || 0),
-        estoque: Number(b.quantidade || b.quantity || b.stock || 0),
-        categoria: normalizeCategory(b.categoria || b.category || b.genero || b.categoriaNome || b.categoria_nome || "LIVROS"),
-        editora: b.editora || b.publisher || ""
-      }));
-      const products = allProducts().map(p => ({
-        origem: "PRODUCT",
-        id: String(p.id),
-        nome: p.nome || p.name || "Sem nome",
-        autor: p.marca || p.brand || "",
-        preco: Number(p.preco || p.value || p.valor || 0),
-        estoque: Number(p.quantidade || p.quantity || p.stock || 0),
-        categoria: normalizeCategory(p.categoria || p.category || p.genero || p.categoriaNome || p.categoria_nome || "PRODUTOS DIVERSOS"),
-        editora: p.editora || p.publisher || ""
-      }));
-      const all = [...books, ...products];
-      const order = ["LIVROS", "PAPELARIA", "PRODUTOS DIVERSOS", "ELETRÔNICOS"];
-      const categories = [...new Set(all.map(x => x.categoria))].sort((a,b)=>{
-        const ia = order.indexOf(a), ib = order.indexOf(b);
-        if (ia === -1 && ib === -1) return a.localeCompare(b);
-        if (ia === -1) return 1;
-        if (ib === -1) return -1;
-        return ia - ib;
-      });
-      categories.forEach(cat => {
-        const optg = document.createElement("optgroup");
-        optg.label = cat;
-        all.filter(x => x.categoria === cat).forEach(item => {
-          const opt = document.createElement("option");
-          opt.value = `${item.origem}::${item.id}`;
-          opt.dataset.origem = item.origem;
-          opt.dataset.id = item.id;
-          opt.dataset.preco = item.preco;
-          opt.dataset.estoque = item.estoque;
-          let text = "";
-          if (item.origem === "BOOK") {
-            text = `${item.nome}${item.autor ? " - " + item.autor : ""} (Estoque: ${item.estoque}) - ${formatCurrency(item.preco)}`;
-          } else {
-            const emoji = ICONS[item.categoria] || "📦";
-            text = `${emoji} ${item.nome}${item.autor ? " - " + item.autor : ""} (Estoque: ${item.estoque}) - ${formatCurrency(item.preco)}`;
-          }
-          opt.textContent = text;
-          optg.appendChild(opt);
-        });
-        selectEl.appendChild(optg);
-      });
+  if (!selectEl) return;
+
+  selectEl.innerHTML = `<option value="">Selecione um item disponível</option>`;
+
+  const ICONS = {
+    "ACESSORIOS": "👜",
+    "PAPELARIA": "📎",
+    "MÍDIA": "💿",
+    "CD": "💿",
+    "DVD": "📀",
+    "DECORACAO": "🖼️",
+    "PRESENTES": "🎁",
+    "BRINCO": "💍",
+    "COLAR": "📿",
+    "ABAJU": "💡",
+    "OUTROS": "📦",
+    "PRODUTOS DIVERSOS": "📦"
+  };
+
+  const livroCategorias = [
+    "LIVROS",
+    "TEOLOGICO",
+    "DEVOCIONAL",
+    "BIOGRAFIA",
+    "INFANTIL",
+    "ESTUDO BÍBLICO"
+  ];
+
+  const books = allBooks().map(b => ({
+    origem: "BOOK",
+    id: String(b.id),
+    nome: b.titulo || b.title || b.name || "Sem título",
+    autor: b.autor || b.author || "",
+    preco: Number(b.preco || b.value || b.valor || 0),
+    estoque: Number(b.quantidade || b.quantity || b.stock || 0),
+    categoria: normalizeCategory(
+      b.categoria || b.category || b.genero || b.categoriaNome || b.categoria_nome || "LIVROS"
+    ),
+    editora: b.editora || b.publisher || ""
+  }));
+
+  const products = allProducts().map(p => ({
+    origem: "PRODUCT",
+    id: String(p.id),
+    nome: p.nome || p.name || "Sem nome",
+    autor: p.marca || p.brand || "",
+    preco: Number(p.preco || p.value || p.valor || 0),
+    estoque: Number(p.quantidade || p.quantity || p.stock || 0),
+    categoriaOriginal: normalizeCategory(
+      p.categoria || p.category || p.genero || p.categoriaNome || p.categoria_nome || "OUTROS"
+    ),
+    categoria: "PRODUTOS DIVERSOS",
+    editora: p.editora || p.publisher || ""
+  }));
+
+  const all = [...books, ...products];
+
+  all.forEach(x => {
+    const cat = x.categoriaOriginal ? x.categoriaOriginal.toUpperCase() : x.categoria.toUpperCase();
+    if (livroCategorias.includes(cat)) {
+      x.categoria = "LIVROS";
+      x.categoriaOriginal = cat;
     }
+  });
+
+  const categories = ["LIVROS", "PRODUTOS DIVERSOS"];
+
+  categories.forEach(cat => {
+    const optg = document.createElement("optgroup");
+    optg.label = cat;
+    optg.style.fontWeight = "bold";
+    optg.style.color = "#4b0000";
+
+    all
+      .filter(x => x.categoria === cat)
+      .forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = `${item.origem}::${item.id}`;
+        opt.dataset.origem = item.origem;
+        opt.dataset.id = item.id;
+        opt.dataset.preco = item.preco;
+        opt.dataset.estoque = item.estoque;
+
+      
+        let displayName = "";
+        if (cat === "PRODUTOS DIVERSOS") {
+          const emoji =
+            ICONS[item.categoriaOriginal?.toUpperCase()] ||
+            ICONS[item.categoria] ||
+            "📦";
+          displayName += `${emoji} `;
+        }
+
+        const nome = item.nome || "Sem nome";
+        const autor = item.autor ? " - " + item.autor : "";
+        const estoque = `(Estoque: ${item.estoque})`;
+        const preco = `R$ ${item.preco.toFixed(2).replace(".", ",")}`;
+
+        opt.textContent = `${displayName}${nome}${autor} ${estoque} - ${preco}`;
+        optg.appendChild(opt);
+      });
+
+    selectEl.appendChild(optg);
+  });
+}
+
 
     let cart = [];
 
