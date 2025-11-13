@@ -177,18 +177,18 @@ document.addEventListener("DOMContentLoaded", () => {
   selectEl.innerHTML = `<option value="">Selecione um item disponível</option>`;
 
   const ICONS = {
-    "ACESSORIOS": "👜",
-    "PAPELARIA": "📎",
+    "PAPELARIA": "📄",
+    "MÍDIA (CD/DVD)": "💿",
     "MÍDIA": "💿",
-    "CD": "💿",
-    "DVD": "📀",
-    "DECORACAO": "🖼️",
+    "CD/DVD": "💿",
+    "DISCOS DE VINIL": "🎵",
+    "VINIL": "🎵",
+    "ACESSÓRIOS": "👜",
+    "ACESSORIOS": "👜",
     "PRESENTES": "🎁",
-    "BRINCO": "💍",
-    "COLAR": "📿",
-    "ABAJU": "💡",
-    "OUTROS": "📦",
-    "PRODUTOS DIVERSOS": "📦"
+    "DECORAÇÃO": "🖼️",
+    "DECORACAO": "🖼️",
+    "OUTROS": "📦"
   };
 
   const livroCategorias = [
@@ -255,14 +255,13 @@ document.addEventListener("DOMContentLoaded", () => {
         opt.dataset.preco = item.preco;
         opt.dataset.estoque = item.estoque;
 
-      
         let displayName = "";
         if (cat === "PRODUTOS DIVERSOS") {
           const emoji =
             ICONS[item.categoriaOriginal?.toUpperCase()] ||
             ICONS[item.categoria] ||
-            "📦";
-          displayName += `${emoji} `;
+            "";
+          if (emoji) displayName += `${emoji} `;
         }
 
         const nome = item.nome || "Sem nome";
@@ -277,6 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
     selectEl.appendChild(optg);
   });
 }
+
 
 
     let cart = [];
