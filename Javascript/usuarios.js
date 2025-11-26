@@ -369,7 +369,7 @@ const UIManager = {
     confirmBtn.onclick = () => {
       overlay.style.display = "none";
       setTimeout(() => {
-        window.location.href = "login.html";
+        window.location.href = "index.html";
       }, 300);
     };
   },
