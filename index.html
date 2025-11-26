@@ -1,35 +1,315 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Sistema da Livraria</title>
-  <link rel="stylesheet" href="CSS/login.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Informações da Livraria</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="CSS/livraria.css">
+  </head>
+  <body>
+    <div id="dashboard" class="dashboard">
+      <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">Livraria</div>
+          <div class="sidebar-logo">Sola Scriptura</div>
+        </div>
+        <div class="sidebar-nav">
+          <a class="nav-item" data-section="dashboard" href="dashboard.html">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+          </a>
+          <a class="nav-item" data-section="books" href="livros.html">
+            <i class="fas fa-warehouse"></i>
+            <span>Livros</span>
+          </a>
+          <a class="nav-item" data-section="clients" href="clientes.html">
+            <i class="fas fa-address-book"></i>
+            <span>Clientes</span>
+          </a>
+          <a class="nav-item" data-section="sales" href="venda.html">
+            <i class="fas fa-cash-register"></i>
+            <span>Vendas</span>
+          </a>
+          <a class="nav-item" data-section="loans" href="emprestimos.html">
+            <i class="fas fa-handshake"></i>
+            <span>Empréstimos</span>
+          </a>
+          <a class="nav-item" data-section="reports" href="relatorios.html">
+            <i class="fas fa-chart-line"></i>
+            <span>Relatórios</span>
+          </a>
+          <a class="nav-item" data-section="products" href="produtos.html">
+            <i class="fas fa-shopping-bag"></i>
+            <span>Produtos Diversos</span>
+          </a>
+          <a
+            class="nav-item active"
+            data-section="bookstore"
+            href="livraria.html"
+          >
+            <i class="fas fa-store"></i>
+            <span>Livraria</span>
+          </a>
+          <a class="nav-item" data-section="users" href="usuarios.html">
+            <i class="fas fa-user-cog"></i>
+            <span>Usuários</span>
+          </a>
+          <a class="nav-item" href="#" onclick="UIManager.handleLogout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Sair</span>
+          </a>
+        </div>
+        <div
+          style="
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+          "
+        >
+          <button
+            class="btn-icon"
+            id="sidebarToggle"
+            style="
+              background: var(--primary-color);
+              color: white;
+              border: none;
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              cursor: pointer;
+              transition: var(--transition);
+              position: relative;
+              top: 90px;
+            "
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        </div>
+      </nav>
+      <main class="main-content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+              <i class="fas fa-bars"></i>
+            </button>
+            <h1 id="pageTitle">Painel Administrativo</h1>
+          </div>
+          <div class="topbar-right">
+            <div class="user-info">
+              <div class="user-avatar">A</div>
+              <div class="user-details">
+                <div class="user-name" id="currentUser">Admin</div>
+                <div class="user-role">Administrador</div>
+              </div>
+            </div>
+          </div>
+        </header>
+        <div class="content-area">
+          <section id="bookstoreSection">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">Informações da Livraria</h2>
+                  <p class="card-subtitle">
+                    Configure os dados da sua livraria
+                  </p>
+                </div>
+                <button class="btn btn-primary" id="editBookstoreBtn">
+                  <i class="fas fa-edit"></i>
+                  Editar Informações
+                </button>
+              </div>
+              <div
+                id="bookstoreInfo"
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                  gap: 24px;
+                "
+              >
+                <div class="info-card">
+                  <h3
+                    style="
+                      color: var(--primary-color);
+                      margin-bottom: 16px;
+                      font-size: 1.1rem;
+                    "
+                  >
+                    <i class="fas fa-store"></i> Dados Gerais
+                  </h3>
+                  <div class="info-item">
+                    <strong>Nome:</strong>
+                    <span id="bookstoreName">Livraria Sola Scriptura</span>
+                  </div>
+                  <div class="info-item">
+                    <strong>CNPJ:</strong>
+                    <span id="bookstoreCNPJ">00.000.000/0001-00</span>
+                  </div>
+                  <div class="info-item">
+                    <strong>Telefone:</strong>
+                    <span id="bookstorePhone">(11) 99999-9999</span>
+                  </div>
+                  <div class="info-item">
+                    <strong>Email:</strong>
+                    <span id="bookstoreEmail">contato@solascriptura.com</span>
+                  </div>
+                </div>
+                <div class="info-card">
+                  <h3
+                    style="
+                      color: var(--primary-color);
+                      margin-bottom: 16px;
+                      font-size: 1.1rem;
+                    "
+                  >
+                    <i class="fas fa-map-marker-alt"></i> Endereço
+                  </h3>
+                  <div class="info-item">
+                    <strong>Rua:</strong>
+                    <span id="bookstoreStreet">Rua das Escrituras, 123</span>
+                  </div>
+                  <div class="info-item">
+                    <strong>Bairro:</strong>
+                    <span id="bookstoreNeighborhood">Centro</span>
+                  </div>
+                  <div class="info-item">
+                    <strong>Cidade:</strong>
+                    <span id="bookstoreCity">São Paulo</span>
+                  </div>
+                  <div class="info-item">
+                    <strong>CEP:</strong>
+                    <span id="bookstoreCEP">01000-000</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
 
-  <div class="login-container">
-    <h1>Bem-vindo</h1>
-    <p>Entre com suas credenciais para continuar</p>
-
-    <div id="errorMessage" class="error-message"></div>
-
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="email">E-mail</label>
-        <input type="email" id="email" placeholder="Digite seu e-mail">
+    
+    <div class="modal" id="bookstoreModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Editar Informações da Livraria</h3>
+          <button class="close-btn" id="closeBookstoreModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <form class="form-grid" id="bookstoreForm">
+          <div class="form-group form-grid-full">
+            <label class="form-label">Nome da Livraria</label>
+            <input
+              class="form-input"
+              id="bookstoreFormName"
+              required=""
+              type="text"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">CNPJ</label>
+            <input
+              class="form-input"
+              id="bookstoreFormCNPJ"
+              required=""
+              type="text"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefone</label>
+            <input
+              class="form-input"
+              id="bookstoreFormPhone"
+              required=""
+              type="text"
+            />
+          </div>
+          <div class="form-group form-grid-full">
+            <label class="form-label">Email</label>
+            <input
+              class="form-input"
+              id="bookstoreFormEmail"
+              required=""
+              type="email"
+            />
+          </div>
+          <div class="form-group form-grid-full">
+            <label class="form-label">Endereço</label>
+            <input
+              class="form-input"
+              id="bookstoreFormStreet"
+              placeholder="Rua, número"
+              required=""
+              type="text"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bairro</label>
+            <input
+              class="form-input"
+              id="bookstoreFormNeighborhood"
+              required=""
+              type="text"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cidade</label>
+            <input
+              class="form-input"
+              id="bookstoreFormCity"
+              required=""
+              type="text"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">CEP</label>
+            <input
+              class="form-input"
+              id="bookstoreFormCEP"
+              required=""
+              type="text"
+            />
+          </div>
+          <div class="form-grid-full">
+            <div style="display: flex; gap: 10px; justify-content: flex-end">
+              <button
+                class="btn btn-secondary"
+                id="cancelBookstoreBtn"
+                type="button"
+              >
+                Cancelar
+              </button>
+              <button class="btn btn-primary" type="submit">
+                <i class="fas fa-save"></i>
+                Salvar Informações
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
-
-      <div class="form-group">
-        <label for="password">Senha</label>
-        <input type="password" id="password" placeholder="Digite sua senha">
+    </div>
+    <div class="modal" id="confirmModal">
+      <div class="confirm-dialog">
+        <h3 id="confirmTitle">Confirmar Ação</h3>
+        <p id="confirmMessage">Tem certeza que deseja realizar esta ação?</p>
+        <div class="confirm-buttons">
+          <button class="btn btn-secondary" id="confirmCancel">Cancelar</button>
+          <button class="btn btn-danger" id="confirmOk">Confirmar</button>
+        </div>
       </div>
-
-      <button type="submit" class="btn-login">Entrar</button>
-    </form>
-  </div>
-
-  <div id="toastContainer"></div>
-  <script src="Javascript/login.js"></script>
-</body>
+    </div>
+    <div id="toastContainer"></div>
+    
+    <script src="Javascript/livraria.js"></script>
+  </body>
 </html>
